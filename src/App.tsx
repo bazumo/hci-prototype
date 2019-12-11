@@ -20,6 +20,7 @@ import FolderIcon from "@material-ui/icons/Folder";
 import RestoreIcon from "@material-ui/icons/Restore";
 import FavoriteIcon from "@material-ui/icons/Favorite";
 import LocationOnIcon from "@material-ui/icons/LocationOn";
+import FormatListNumberedIcon from '@material-ui/icons/FormatListNumbered';
 
 import ViewModuleIcon from "@material-ui/icons/ViewModule";
 import React, { useState } from "react";
@@ -27,6 +28,7 @@ import "./App.css";
 import { BrowserRouter, Switch, Route, Link } from "react-router-dom";
 import { Homepage } from "./Pages/Homepage";
 import { Graphview } from "./Pages/Graphview";
+import { AccountListView } from "./Pages/AccountListView";
 
 const theme = createMuiTheme({
   palette: {
@@ -75,6 +77,15 @@ const App: React.FC = () => {
                 </IconButton>
               </Link>
 
+              <Link to="/list">
+                <IconButton
+                  edge="start"
+                  style={{ color: "white" }}
+                  aria-label="menu"
+                >
+                  <FormatListNumberedIcon />
+                </IconButton>
+              </Link>
               <Link to="/graph">
                 <IconButton
                   edge="start"
@@ -98,6 +109,9 @@ const App: React.FC = () => {
         <Switch>
           <Route path="/graph">
             <Graphview />
+          </Route>
+          <Route path="/list">
+            <AccountListView />
           </Route>
           <Route path="/account">
             <div>Single Account</div>
