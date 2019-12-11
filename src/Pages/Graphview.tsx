@@ -25,34 +25,3 @@ export const Graphview: React.FC<{}> = () => {
     </Box>
   );
 };
-
-function NotificationListItem(props: {
-  icon?: ReactNode;
-  primary: string;
-  secondary: string;
-}) {
-  return (
-    <ListItem alignItems="flex-start">
-      <ListItemIcon>
-        <ListItemAvatar>
-          <Avatar>{props.icon ? props.icon : <ErrorIcon />}</Avatar>
-        </ListItemAvatar>
-      </ListItemIcon>
-      <ListItemText primary={props.primary} secondary={props.secondary} />
-    </ListItem>
-  );
-}
-
-function ProgressCircle({
-  title,
-  ...circleProps
-}: CircleProps & { title: string }) {
-  return (
-    <Box width="20vw">
-      <Circle responsive {...circleProps} />
-      <Box mt={0} textAlign="center">
-        {title}
-      </Box>
-    </Box>
-  );
-}

@@ -21,7 +21,7 @@ export const Homepage: React.FC<{}> = () => {
       <Container>
         <Box display="flex" justifyContent="center" mt={4}>
           <Box maxWidth="50vw" margin="auto">
-            <Circle progress={35} responsive />
+            <Circle progress={100} responsive />
           </Box>
         </Box>
         <Box display="flex" justifyContent="space-around" mt={8}>
