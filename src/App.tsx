@@ -62,7 +62,7 @@ const App: React.FC = () => {
             >
               <MenuIcon />
             </IconButton>
-            <Typography variant="h6">Account Sanity</Typography>
+            <Typography variant="h6">Account Sanity blub</Typography>
             <Box style={{ marginLeft: "auto" }}>
               <Link to="/">
                 <IconButton
@@ -97,13 +97,13 @@ const App: React.FC = () => {
         </SwipeableDrawer>
         <Switch>
           <Route path="/graph">
-            <Graphview></Graphview>
+            <Graphview />
           </Route>
           <Route path="/account">
             <div>Single Account</div>
           </Route>
           <Route path="/">
-            <Homepage></Homepage>
+            <Homepage />
           </Route>
         </Switch>
         <Box>
