@@ -17,7 +17,7 @@ export const AccountList: React.FC<{}> = () => {
         <ListItem alignItems="flex-start">
           <ListItemIcon>
           <ListItemAvatar>
-            <Avatar>{<ErrorIcon />}</Avatar>
+            <Avatar src={a.logo} />
           </ListItemAvatar>
           </ListItemIcon>
           <ListItemText primary={a.id} secondary={a.url} />

@@ -13,7 +13,7 @@ interface Account {
   lastLoggedIn: Date;
 
   backgroundImage: ReactNode;
-  logo: ReactNode;
+  logo: string;
 
   twoFA: boolean;
   compromised: boolean;
@@ -46,18 +46,21 @@ export const accounts: Account[] = [
     ...defaultData,
     id: "Spotify",
     score: 78,
+    logo: "http://cdn.osxdaily.com/wp-content/uploads/2019/03/spotify-icon.jpg",
     url: "https://www.spotify.com/"
   },
   {
     ...defaultData,
     id: "Netflix",
     score: 69,
+    logo: "https://www.freepnglogos.com/uploads/netflix-logo-circle-png-5.png",
     url: "https://www.netflix.com/",
   },
   {
     ...defaultData,
     id: "Github",
     score: 92,
+    logo: "https://cdn1.iconfinder.com/data/icons/social-media-vol-1-1/24/_github-512.png",
     url: "https://github.com/",
   }
 ];

@@ -7,11 +7,13 @@ import {
 
 export const AccountListView: React.FC<{}> = () => {
     return (
-    <Box>
+    <Box display="flex" justifyContent="center">
+      <Box>
       <Container>
         <p>Accountlist</p>
           <AccountList></AccountList>
       </Container>
+      </Box>
     </Box>
     );
 };
