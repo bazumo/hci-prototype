@@ -20,6 +20,7 @@ import { BottomNav } from "./Pages/Components/BottomNav";
 import { SideNav } from "./Pages/Components/SideNav";
 import { TopNav } from "./Pages/Components/TopNav";
 import { SingleAccountView } from "./Pages/SingleAccountView";
+import { Box } from "@material-ui/core";
 
 const theme = createMuiTheme({
   palette: {
@@ -41,6 +42,7 @@ const App: React.FC = () => {
   return (
     <ThemeProvider theme={theme}>
       <BrowserRouter>
+        <Box height="56px"></Box>
         <TopNav setOpen={setOpen}></TopNav>
         <SideNav open={open} setOpen={setOpen}></SideNav>
         <Switch>
@@ -51,8 +53,8 @@ const App: React.FC = () => {
             <AccountListView />
           </Route>
           <Route path="/account/:id">
-            <SingleAccountView/>  
-          </Route> 
+            <SingleAccountView />
+          </Route>
           <Route path="/">
             <Homepage />
           </Route>

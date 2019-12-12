@@ -5,7 +5,7 @@ import {
 } from "@material-ui/core";
 import LocationOnIcon from "@material-ui/icons/LocationOn";
 import AccountCircle from "@material-ui/icons/AccountCircle";
-import BubbleChartIcon from '@material-ui/icons/BubbleChart';
+import BubbleChartIcon from "@material-ui/icons/BubbleChart";
 import ViewModuleIcon from "@material-ui/icons/ViewModule";
 import FormatListNumberedIcon from "@material-ui/icons/FormatListNumbered";
 import React from "react";
