@@ -1,9 +1,6 @@
 import React, { ReactNode } from "react";
-import {AccountList} from "./Components/AccountList"
-import {
-    Box,
-    Container,
-  } from "@material-ui/core";
+import { AccountList } from "./Components/AccountList";
+import { Box, Container } from "@material-ui/core";
 
 export const AccountListView: React.FC<{}> = () => {
     return (
@@ -11,9 +8,9 @@ export const AccountListView: React.FC<{}> = () => {
       <Box>
       <Container>
         <p>Accountlist</p>
-          <AccountList></AccountList>
+        <AccountList></AccountList>
       </Container>
       </Box>
     </Box>
-    );
+  );
 };
