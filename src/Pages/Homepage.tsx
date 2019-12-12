@@ -15,6 +15,8 @@ import {
 import Circle, { CircleProps } from "react-circle";
 import ErrorIcon from "@material-ui/icons/Error";
 
+function getPasswordScore() {}
+
 export const Homepage: React.FC<{}> = () => {
   return (
     <Box>

@@ -4,11 +4,6 @@ import {
   ThemeProvider,
   makeStyles
 } from "@material-ui/core/styles";
-import FolderIcon from "@material-ui/icons/Folder";
-import RestoreIcon from "@material-ui/icons/Restore";
-import FavoriteIcon from "@material-ui/icons/Favorite";
-import Timeline from "@material-ui/icons/Timeline";
-import Assessment from "@material-ui/icons/Assessment";
 
 import React, { useState } from "react";
 import "./App.css";
@@ -21,6 +16,20 @@ import { SideNav } from "./Pages/Components/SideNav";
 import { TopNav } from "./Pages/Components/TopNav";
 import { SingleAccountView } from "./Pages/SingleAccountView";
 import { Box } from "@material-ui/core";
+
+import { createContainer } from "unstated-next";
+import { accounts as fakeAccounts, Account } from "./fakedata";
+
+function useAccounts(initialState: Account[] = fakeAccounts) {
+  let [accounts, setAccounts] = useState(initialState);
+  let deleteAccount = (id: string) =>
+    setAccounts(accounts.filter(a => a.id !== id));
+  let modifyAccount = (id: string, account: Account) =>
+    setAccounts([...accounts.filter(a => a.id !== id), account]);
+  return { accounts, deleteAccount, modifyAccount };
+}
+
+export const Accounts = createContainer(useAccounts);
 
 const theme = createMuiTheme({
   palette: {
@@ -41,26 +50,28 @@ const App: React.FC = () => {
 
   return (
     <ThemeProvider theme={theme}>
-      <BrowserRouter>
-        <Box height="56px"></Box>
-        <TopNav setOpen={setOpen}></TopNav>
-        <SideNav open={open} setOpen={setOpen}></SideNav>
-        <Switch>
-          <Route path="/graph">
-            <Graphview />
-          </Route>
-          <Route path="/list">
-            <AccountListView />
-          </Route>
-          <Route path="/account/:id">
-            <SingleAccountView />
-          </Route>
-          <Route path="/">
-            <Homepage />
-          </Route>
-        </Switch>
-        <BottomNav></BottomNav>
-      </BrowserRouter>
+      <Accounts.Provider>
+        <BrowserRouter>
+          <Box height="56px"></Box>
+          <TopNav setOpen={setOpen}></TopNav>
+          <SideNav open={open} setOpen={setOpen}></SideNav>
+          <Switch>
+            <Route path="/graph">
+              <Graphview />
+            </Route>
+            <Route path="/list">
+              <AccountListView />
+            </Route>
+            <Route path="/account/:id">
+              <SingleAccountView />
+            </Route>
+            <Route path="/">
+              <Homepage />
+            </Route>
+          </Switch>
+          <BottomNav></BottomNav>
+        </BrowserRouter>
+      </Accounts.Provider>
     </ThemeProvider>
   );
 };
