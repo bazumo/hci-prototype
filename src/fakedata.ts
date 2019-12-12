@@ -43,9 +43,21 @@ const defaultData: Account = {
 
 export const accounts: Account[] = [
   {
+    ...defaultData,
     id: "Spotify",
     score: 78,
-    url: "https://www.spotify.com/de/",
-    ...defaultData
+    url: "https://www.spotify.com/"
+  },
+  {
+    ...defaultData,
+    id: "Netflix",
+    score: 69,
+    url: "https://www.netflix.com/",
+  },
+  {
+    ...defaultData,
+    id: "Github",
+    score: 92,
+    url: "https://github.com/",
   }
 ];
