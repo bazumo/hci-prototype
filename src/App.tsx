@@ -24,8 +24,14 @@ function useAccounts(initialState: Account[] = fakeAccounts) {
   let [accounts, setAccounts] = useState(initialState);
   let deleteAccount = (id: string) =>
     setAccounts(accounts.filter(a => a.id !== id));
-  let modifyAccount = (id: string, account: Account) =>
-    setAccounts([...accounts.filter(a => a.id !== id), account]);
+  let modifyAccount = (id: string, account: Partial<Account>) =>
+    setAccounts([
+      ...accounts.filter(a => a.id !== id),
+      {
+        ...accounts.find(a => a.id === id)!,
+        ...account
+      }
+    ]);
   return { accounts, deleteAccount, modifyAccount };
 }
 
