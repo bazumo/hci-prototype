@@ -15,7 +15,7 @@ export const TopNav: React.FC<{
   setOpen: any;
 }> = ({ setOpen }) => {
   return (
-    <AppBar position="static">
+    <AppBar position="fixed">
       <Toolbar>
         <IconButton
           edge="start"
@@ -25,10 +25,10 @@ export const TopNav: React.FC<{
         >
           <MenuIcon />
         </IconButton>
-        <Typography variant="h6">Account Sanity blub</Typography>
+        <Typography variant="h6">Account Sanity Tool</Typography>
         <Box style={{ marginLeft: "auto" }}>
-          <Link to="/">
-            <IconButton
+             {/*<Link to="/">
+                <IconButton
               edge="start"
               color="inherit"
               aria-label="menu"
@@ -55,7 +55,8 @@ export const TopNav: React.FC<{
             >
               <ViewModuleIcon />
             </IconButton>
-          </Link>
+          </Link> */}     
+          
         </Box>
       </Toolbar>
     </AppBar>

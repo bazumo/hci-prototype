@@ -5,7 +5,9 @@ import {
 } from "@material-ui/core";
 import LocationOnIcon from "@material-ui/icons/LocationOn";
 import AccountCircle from "@material-ui/icons/AccountCircle";
+import BubbleChartIcon from '@material-ui/icons/BubbleChart';
 import ViewModuleIcon from "@material-ui/icons/ViewModule";
+import FormatListNumberedIcon from "@material-ui/icons/FormatListNumbered";
 import React from "react";
 import { useLocation, useHistory } from "react-router-dom";
 import { useStyles } from "../../App";
@@ -37,12 +39,12 @@ export const BottomNav: React.FC<{}> = ({}) => {
         <BottomNavigationAction
           label="Graph"
           value="/graph"
-          icon={<ViewModuleIcon />}
+          icon={<BubbleChartIcon />}
         />
         <BottomNavigationAction
           label="List"
           value="/list"
-          icon={<LocationOnIcon />}
+          icon={<FormatListNumberedIcon />}
         />
       </BottomNavigation>
     </Box>

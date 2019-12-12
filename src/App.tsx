@@ -19,6 +19,7 @@ import { AccountListView } from "./Pages/AccountListView";
 import { BottomNav } from "./Pages/Components/BottomNav";
 import { SideNav } from "./Pages/Components/SideNav";
 import { TopNav } from "./Pages/Components/TopNav";
+import { SingleAccountView } from "./Pages/SingleAccountView";
 
 const theme = createMuiTheme({
   palette: {
@@ -49,9 +50,9 @@ const App: React.FC = () => {
           <Route path="/list">
             <AccountListView />
           </Route>
-          <Route path="/account">
-            <div>Single Account</div>
-          </Route>
+          <Route path="/account/:id">
+            <SingleAccountView/>  
+          </Route> 
           <Route path="/">
             <Homepage />
           </Route>
