@@ -24,7 +24,7 @@ function getScores(accounts: Account[]) {
   const accountScore =
     accounts.reduce((acc, a) => acc + 30, 0) / accounts.length;
   const protectionScore =
-    accounts.reduce((acc, a) => acc * (a.compromised ? 0.1 : 1), 1) * 90;
+    accounts.reduce((acc, a) => acc * (a.compromised ? 0.8 : 1), 1) * 90;
   const dependenyScore =
     accounts.reduce((acc, a) => acc + 10, 0) / accounts.length;
   const globalScore = Math.min(

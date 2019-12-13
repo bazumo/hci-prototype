@@ -75,6 +75,8 @@ const App: React.FC = () => {
               <Homepage />
             </Route>
           </Switch>
+          <Box height="56px"></Box>
+
           <BottomNav></BottomNav>
         </BrowserRouter>
       </Accounts.Provider>
