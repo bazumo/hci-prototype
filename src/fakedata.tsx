@@ -129,7 +129,7 @@ export const accounts: Account[] = [
     id: "Steam",
     score: 92,
     url: "https://store.steampowered.com/",
-    username: "saic4anfly",
+    username: "saic4nfly",
     email: "saimurray@gmail.com",
     password: "S4SdVAU5RGfk",
     created: new Date(2016, 1, 1),
