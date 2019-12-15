@@ -1,20 +1,19 @@
-import React, { ReactNode } from "react";
 import {
-  List,
-  Divider,
-  ListItem,
-  ListItemText,
   Avatar,
+  List,
+  ListItem,
   ListItemAvatar,
-  ListItemIcon
+  ListItemIcon,
+  ListItemText
 } from "@material-ui/core";
+import AccessTimeIcon from "@material-ui/icons/AccessTime";
+import AddCircleIcon from "@material-ui/icons/AddCircle";
 import ErrorIcon from "@material-ui/icons/Error";
-import { Accounts } from "../App";
-import { prependOnceListener } from "cluster";
-import AddCircleIcon from '@material-ui/icons/AddCircle';
-import AccessTimeIcon from '@material-ui/icons/AccessTime';
-import { accounts, Account } from "../fakedata";
+import React from "react";
 import { useHistory } from "react-router-dom";
+import { Accounts } from "../App";
+import { Account } from "../fakedata";
+import { scoreToColor } from "../Pages/Homepage";
 
 export const OptimizationList: React.FC<{}> = props => {
   const { accounts } = Accounts.useContainer();
@@ -26,13 +25,13 @@ export const OptimizationList: React.FC<{}> = props => {
           <CompromisedItem a={a}></CompromisedItem>
         ))}
       {accounts
-        .filter(b => !b.twoFA && Math.random() < 0.5)
-        .map (a => (
+        .filter(b => !b.twoFA && b.supportsTwoFAP)
+        .map(a => (
           <TwoFAItem a={a}></TwoFAItem>
         ))}
       {accounts
         .filter(b => b.lastLoggedIn < new Date(2019, 6, 12))
-        .map (a => (
+        .map(a => (
           <InactivityItem a={a}></InactivityItem>
         ))}
     </List>
@@ -52,7 +51,9 @@ function CompromisedItem({ a }: { a: Account }) {
     >
       <ListItemIcon>
         <ListItemAvatar>
-          <Avatar>{<ErrorIcon />}</Avatar>
+          <Avatar style={{ backgroundColor: scoreToColor(0) }}>
+            {<ErrorIcon />}
+          </Avatar>
         </ListItemAvatar>
       </ListItemIcon>
       <ListItemText
@@ -66,7 +67,7 @@ function CompromisedItem({ a }: { a: Account }) {
   );
 }
 
-function TwoFAItem({a}: {a : Account}) {
+function TwoFAItem({ a }: { a: Account }) {
   const { accounts } = Accounts.useContainer();
 
   const history = useHistory();
@@ -78,7 +79,9 @@ function TwoFAItem({a}: {a : Account}) {
     >
       <ListItemIcon>
         <ListItemAvatar>
-          <Avatar>{<AddCircleIcon />}</Avatar>
+          <Avatar style={{ backgroundColor: scoreToColor(60) }}>
+            {<AddCircleIcon />}
+          </Avatar>
         </ListItemAvatar>
       </ListItemIcon>
       <ListItemText
@@ -89,7 +92,7 @@ function TwoFAItem({a}: {a : Account}) {
   );
 }
 
-function InactivityItem({a}: {a : Account}) {
+function InactivityItem({ a }: { a: Account }) {
   const { accounts } = Accounts.useContainer();
 
   const history = useHistory();
@@ -101,7 +104,9 @@ function InactivityItem({a}: {a : Account}) {
     >
       <ListItemIcon>
         <ListItemAvatar>
-          <Avatar>{<AccessTimeIcon />}</Avatar>
+          <Avatar style={{ backgroundColor: scoreToColor(70) }}>
+            {<AccessTimeIcon />}
+          </Avatar>
         </ListItemAvatar>
       </ListItemIcon>
       <ListItemText

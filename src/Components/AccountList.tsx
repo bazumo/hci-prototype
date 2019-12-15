@@ -23,7 +23,14 @@ export const useStyles = makeStyles({
   }
 });
 
-export const AccountList: React.FC<{ sort: number; twoFa: number, compromised: number, username: number, email : number, search: string}> = props => {
+export const AccountList: React.FC<{
+  sort: number;
+  twoFa: number;
+  compromised: number;
+  username: number;
+  email: number;
+  search: string;
+}> = props => {
   const sorts = [
     (a: Account, b: Account): number =>
       a.id > b.id ? 1 : a.id < b.id ? -1 : 0,
@@ -46,27 +53,38 @@ export const AccountList: React.FC<{ sort: number; twoFa: number, compromised: n
   const emails = Array.from(new Set(accounts.map(a => a.email)));
 
   console.log(props.email);
-  console.log(emails[props.email-1]);
+  console.log(emails[props.email - 1]);
 
   const filtered_accounts = accounts
-  .filter(a =>
-    props.twoFa == 1 ? a.twoFA : props.twoFa == 2 ? !a.twoFA : true
-  )
-  .filter(a =>
-    props.compromised == 1 ? a.compromised : props.compromised == 2 ? !a.compromised : true 
+    .filter(a =>
+      props.twoFa == 1 ? a.twoFA : props.twoFa == 2 ? !a.twoFA : true
     )
-  .filter(a =>
-    props.username == 0 ? true : usernames[props.username-1] == a.username
-  ).filter(a =>
-    props.email == 0 ? true : emails[props.email-1] == a.email
-  ).filter(a =>
-    a.username.toLowerCase().includes(props.search.toLocaleLowerCase()) 
-    || a.email.toLowerCase().includes(props.search.toLowerCase()) 
-    || a.id.toLowerCase().includes(props.search.toLowerCase())
-  );
+    .filter(a =>
+      props.compromised == 1
+        ? a.compromised
+        : props.compromised == 2
+        ? !a.compromised
+        : true
+    )
+    .filter(a =>
+      props.username == 0 ? true : usernames[props.username - 1] == a.username
+    )
+    .filter(a => (props.email == 0 ? true : emails[props.email - 1] == a.email))
+    .filter(
+      a =>
+        a.username.toLowerCase().includes(props.search.toLocaleLowerCase()) ||
+        a.email.toLowerCase().includes(props.search.toLowerCase()) ||
+        a.id.toLowerCase().includes(props.search.toLowerCase())
+    );
 
   return (
     <List>
+      {filtered_accounts.length == 0 && (
+        <ListItem>
+          {" "}
+          <ListItemText>No accounts found</ListItemText>
+        </ListItem>
+      )}
       {filtered_accounts.sort(sorts[props.sort]).map(a => (
         <ListItem
           alignItems="flex-start"

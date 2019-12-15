@@ -29,12 +29,8 @@ export const ActionView: React.FC<{}> = props => {
         {actionType == "uncompromise" && (
           <CompromisedStepper a={a}></CompromisedStepper>
         )}
-        {actionType == "inactive" && (
-          <InactiveStepper a={a}></InactiveStepper>
-        )}
-        {actionType == "twofa" && (
-          <TwoFAStepper a={a}></TwoFAStepper>
-        )}
+        {actionType == "inactive" && <InactiveStepper a={a}></InactiveStepper>}
+        {actionType == "twofa" && <TwoFAStepper a={a}></TwoFAStepper>}
       </p>
     </Box>
   );
@@ -48,7 +44,7 @@ function getCompromisedSteps() {
   ];
 }
 
-function getCompromisedStepContent(a: Account, step: number) { 
+function getCompromisedStepContent(a: Account, step: number) {
   switch (step) {
     case 0:
       return `First thing you have to do is change your password. 
@@ -103,7 +99,6 @@ function CompromisedStepper({ a }: { a: Account }) {
 
   const history = useHistory();
 
-
   const handleNext = () => {
     setActiveStep(prevActiveStep => prevActiveStep + 1);
   };
@@ -113,10 +108,20 @@ function CompromisedStepper({ a }: { a: Account }) {
   };
 
   const handleReset = () => {
-    const new_password = Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 14);
-    modifyAccount(a.id, {compromised:false, password:new_password})
-    setActiveStep(0);
+    const new_password = Math.random()
+      .toString(36)
+      .substr(0, 14);
     history.goBack();
+
+    others.map(a => {
+      const new_password = Math.random()
+        .toString(36)
+        .substr(0, 14);
+      modifyAccount(a.id, { password: new_password });
+    });
+
+    modifyAccount(a.id, { compromised: false, password: new_password });
+    setActiveStep(0);
   };
 
   return (
@@ -126,11 +131,16 @@ function CompromisedStepper({ a }: { a: Account }) {
           <Step key={label}>
             <StepLabel>{label}</StepLabel>
             <StepContent>
-              <Typography style={{ whiteSpace: "pre" }}>
+              <Typography style={{ whiteSpace: "pre-wrap" }}>
                 {getCompromisedStepContent(a, index)}
               </Typography>
-              {index == 0 && (<Link href={a.url}>visit account</Link>)}
-              {index == 1 && (others.map(b => (<Box><Link href={b.url}>{b.id}</Link></Box>)))}
+              {index == 0 && <Link href={a.url}>visit account</Link>}
+              {index == 1 &&
+                others.map(b => (
+                  <Box>
+                    <Link href={b.url}>{b.id}</Link>
+                  </Box>
+                ))}
               <div className={classes.actionsContainer}>
                 <div>
                   <Button
@@ -174,7 +184,7 @@ function getInactiveSteps() {
   ];
 }
 
-function getInactiveStepContent(a: Account, step: number) { 
+function getInactiveStepContent(a: Account, step: number) {
   switch (step) {
     case 0:
       return `First of all make sure what deleting your account really means.
@@ -195,10 +205,9 @@ function InactiveStepper({ a }: { a: Account }) {
   const classes = useStyles();
   const [activeStep, setActiveStep] = React.useState(0);
   const steps = getInactiveSteps();
-  const { accounts, deleteAccount, modifyAccount} = Accounts.useContainer();
+  const { accounts, deleteAccount, modifyAccount } = Accounts.useContainer();
 
   const history = useHistory();
-
 
   const handleNext = () => {
     setActiveStep(prevActiveStep => prevActiveStep + 1);
@@ -221,10 +230,12 @@ function InactiveStepper({ a }: { a: Account }) {
           <Step key={label}>
             <StepLabel>{label}</StepLabel>
             <StepContent>
-              <Typography style={{ whiteSpace: "pre" }}>
+              <Typography style={{ whiteSpace: "pre-wrap" }}>
                 {getInactiveStepContent(a, index)}
               </Typography>
-              {index == 2 && (<Link href={a!=null ? a.url : ""}>visit account</Link>)}
+              {index == 2 && (
+                <Link href={a != null ? a.url : ""}>visit account</Link>
+              )}
               <div className={classes.actionsContainer}>
                 <div>
                   <Button
@@ -260,16 +271,11 @@ function InactiveStepper({ a }: { a: Account }) {
   );
 }
 
-
 function getTwoFASteps() {
-  return [
-    "What is 2FA?",
-    "Why use 2FA?",
-    "How to enable it"
-  ];
+  return ["What is 2FA?", "Why use 2FA?", "How to enable it"];
 }
 
-function getTwoFAStepContent(a: Account, step: number) { 
+function getTwoFAStepContent(a: Account, step: number) {
   switch (step) {
     case 0:
       return `Two-factor authentication (or 2FA, for short) 
@@ -299,10 +305,9 @@ function TwoFAStepper({ a }: { a: Account }) {
   const classes = useStyles();
   const [activeStep, setActiveStep] = React.useState(0);
   const steps = getTwoFASteps();
-  const { accounts, modifyAccount} = Accounts.useContainer();
+  const { accounts, modifyAccount } = Accounts.useContainer();
 
   const history = useHistory();
-
 
   const handleNext = () => {
     setActiveStep(prevActiveStep => prevActiveStep + 1);
@@ -314,8 +319,10 @@ function TwoFAStepper({ a }: { a: Account }) {
 
   const handleReset = () => {
     setActiveStep(0);
-    modifyAccount(a.id, {twoFA: true});
+
     history.goBack();
+
+    modifyAccount(a.id, { twoFA: true });
   };
 
   return (
@@ -325,10 +332,12 @@ function TwoFAStepper({ a }: { a: Account }) {
           <Step key={label}>
             <StepLabel>{label}</StepLabel>
             <StepContent>
-              <Typography style={{ whiteSpace: "pre" }}>
+              <Typography style={{ whiteSpace: "pre-wrap" }}>
                 {getTwoFAStepContent(a, index)}
               </Typography>
-              {index == 2 && (<Link href={a!=null ? a.url : ""}>visit account</Link>)}
+              {index == 2 && (
+                <Link href={a != null ? a.url : ""}>visit account</Link>
+              )}
               <div className={classes.actionsContainer}>
                 <div>
                   <Button
