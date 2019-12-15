@@ -11,13 +11,11 @@ export const GraphWrapper: React.FC<{}> = () => {
   const { accounts } = Accounts.useContainer();
   useEffect(() => {});
   return (
-    <Box width="100vw" height="80vh">
+    <Box>
       <TestGraph accounts={accounts}></TestGraph>
     </Box>
   );
 };
-
-const color = d3.schemeCategory10;
 
 const Node: React.FC<NodeType> = props => {
   const history = useHistory();
@@ -46,23 +44,21 @@ const Link: React.FC<{ link: any }> = ({ link }) => {
       y2={link.target.y + 25}
       style={{
         stroke: "#900",
-        strokeOpacity: 1,
+        strokeOpacity: 0,
         strokeWidth: 5
       }}
     />
   );
 };
 
-const TestGraph2: React.FC<{ accounts: Account[] }> = ({ accounts }) => {
-  return <div></div>;
-};
-
 type NodeType = SimulationNodeDatum & Account;
 type LinkType = SimulationLinkDatum<NodeType>;
 
 const TestGraph: React.FC<{ accounts: Account[] }> = ({ accounts }) => {
-  const { height, width } = useWindowDimensions();
+  const parentSize = useWindowDimensions();
 
+  const height = parentSize.height * 2;
+  const width = parentSize.width * 2;
   const [nodes, setNodes] = useState(
     accounts.map((a, i) => ({
       index: i,
@@ -71,11 +67,18 @@ const TestGraph: React.FC<{ accounts: Account[] }> = ({ accounts }) => {
       ...a
     })) as NodeType[]
   );
-  const [links, setLinks] = useState([
-    { source: 1, target: 2 },
-    { source: 5, target: 9 },
-    { source: 5, target: 1 }
-  ] as LinkType[]);
+
+  const passwordDependencies: LinkType[] = [];
+
+  accounts.forEach((a1, i) => {
+    accounts.forEach((a2, j) => {
+      if (i !== j && a1.twoFA === a2.twoFA) {
+        passwordDependencies.push({ source: i, target: j });
+      }
+    });
+  });
+
+  const [links, setLinks] = useState(passwordDependencies);
 
   const [simulation, setSimulation] = useState(
     d3
@@ -84,17 +87,19 @@ const TestGraph: React.FC<{ accounts: Account[] }> = ({ accounts }) => {
         "charge",
         d3
           .forceManyBody()
-          .distanceMin(80)
-          .distanceMax(80)
+          .distanceMin(100)
+          .distanceMax(200)
       )
       .force("center", d3.forceCenter(width / 2, height / 2))
       .force(
         "link",
         d3
           .forceLink(links)
-          .distance(50)
-          .strength(1)
+          .distance(100)
+          .strength(0.01)
       )
+      .alphaMin(0.2)
+      .alphaDecay(0.05)
   );
 
   useEffect(() => {
@@ -102,7 +107,10 @@ const TestGraph: React.FC<{ accounts: Account[] }> = ({ accounts }) => {
       setNodes([...nodes]);
       setLinks([...links]);
     });
+    window.scrollTo(width / 4, height / 4);
   }, [simulation]);
+
+  const handleSwitchMode = () => {};
 
   return (
     <div>
@@ -122,6 +130,12 @@ const TestGraph: React.FC<{ accounts: Account[] }> = ({ accounts }) => {
           <Node {...node}></Node>
         ))}
       </div>
+      <Fab
+        color="primary"
+        aria-label="edit"
+        //onClick={handleSwitchMode}
+        style={{ position: "fixed", bottom: "80px", right: "20px" }}
+      ></Fab>
     </div>
   );
 };
