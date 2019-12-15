@@ -15,7 +15,7 @@ import {
 import Circle, { CircleProps } from "react-circle";
 import { Account } from "../fakedata";
 import { Accounts } from "../App";
-import { OptimizationList } from "./Components/OptimizationList";
+import { OptimizationList } from "../Components/OptimizationList";
 import { useSpring, animated } from "react-spring";
 
 function getScores(accounts: Account[]) {

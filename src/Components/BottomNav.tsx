@@ -10,7 +10,7 @@ import ViewModuleIcon from "@material-ui/icons/ViewModule";
 import FormatListNumberedIcon from "@material-ui/icons/FormatListNumbered";
 import React from "react";
 import { useLocation, useHistory } from "react-router-dom";
-import { useStyles } from "../../App";
+import { useStyles } from "../App";
 export const BottomNav: React.FC<{}> = ({}) => {
   const classes = useStyles();
   const location = useLocation();

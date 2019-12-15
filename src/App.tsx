@@ -11,14 +11,15 @@ import { BrowserRouter, Switch, Route, useRouteMatch } from "react-router-dom";
 import { Homepage } from "./Pages/Homepage";
 import { Graphview } from "./Pages/Graphview";
 import { AccountListView } from "./Pages/AccountListView";
-import { BottomNav } from "./Pages/Components/BottomNav";
-import { SideNav } from "./Pages/Components/SideNav";
-import { TopNav } from "./Pages/Components/TopNav";
+import { BottomNav } from "./Components/BottomNav";
+import { SideNav } from "./Components/SideNav";
+import { TopNav } from "./Components/TopNav";
 import { SingleAccountView } from "./Pages/SingleAccountView";
 import { Box } from "@material-ui/core";
 
 import { createContainer } from "unstated-next";
 import { accounts as fakeAccounts, Account } from "./fakedata";
+import { ActionView } from "./Pages/ActionView";
 
 function useAccounts(initialState: Account[] = fakeAccounts) {
   let [accounts, setAccounts] = useState(initialState);
@@ -70,6 +71,9 @@ const App: React.FC = () => {
             </Route>
             <Route path="/account/:id">
               <SingleAccountView />
+            </Route>
+            <Route path="/action/:id/:actionType">
+              <ActionView />
             </Route>
             <Route path="/">
               <Homepage />
