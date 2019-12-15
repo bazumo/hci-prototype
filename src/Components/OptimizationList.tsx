@@ -25,7 +25,7 @@ export const OptimizationList: React.FC<{}> = props => {
           <CompromisedItem a={a}></CompromisedItem>
         ))}
       {accounts
-        .filter(b => !b.twoFA && b.supportsTwoFAP)
+        .filter(b => !b.twoFA && b.supportsTwoFA)
         .map(a => (
           <TwoFAItem a={a}></TwoFAItem>
         ))}
