@@ -40,10 +40,10 @@ const Node: React.FC<NodeType> = props => {
 const Link: React.FC<{ link: any }> = ({ link }) => {
   return (
     <line
-      x1={link.source.x + 40}
-      y1={link.source.y + 100}
-      x2={link.target.x + 40}
-      y2={link.target.y + 100}
+      x1={link.source.x + 25}
+      y1={link.source.y + 25}
+      x2={link.target.x + 25}
+      y2={link.target.y + 25}
       style={{
         stroke: "#900",
         strokeOpacity: 1,
@@ -87,13 +87,13 @@ const TestGraph: React.FC<{ accounts: Account[] }> = ({ accounts }) => {
           .distanceMin(80)
           .distanceMax(80)
       )
-      .force("center", d3.forceCenter())
+      .force("center", d3.forceCenter(width / 2, height / 2))
       .force(
         "link",
         d3
           .forceLink(links)
           .distance(50)
-          .strength(0.1)
+          .strength(1)
       )
   );
 
@@ -106,28 +106,22 @@ const TestGraph: React.FC<{ accounts: Account[] }> = ({ accounts }) => {
 
   return (
     <div>
+      <svg style={{ position: "absolute" }} width={width} height={height}>
+        {links.map(link => (
+          <Link link={link}></Link>
+        ))}
+      </svg>
       <div
         style={{
           width,
           height,
-          position: "relative",
-          transform: "translate(50%, 50%)"
+          position: "relative"
         }}
       >
         {nodes.map(node => (
           <Node {...node}></Node>
         ))}
       </div>
-      <svg
-        style={{ position: "absolute", top: "0" }}
-        width={width}
-        height={height}
-        viewBox={`${-height / 2} ${-width / 2} ${height} ${width}`}
-      >
-        {links.map(link => (
-          <Link link={link}></Link>
-        ))}
-      </svg>
     </div>
   );
 };
