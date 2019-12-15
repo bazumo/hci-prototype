@@ -19,9 +19,11 @@ import { Graph } from "./Components/Graph";
 export const Graphview: React.FC<{}> = () => {
   return (
     <Box>
-      <Container>
-        <Graph></Graph>
-      </Container>
+      {false && <Graph></Graph>}
+      <img src="/graph1.png" style={{ width: "100vw" }}></img>
+      <Box height="100vh"></Box>
+      <img src="/graph2.png" style={{ width: "100vw" }}></img>
+      <Box height="100vh"></Box>
     </Box>
   );
 };
