@@ -13,9 +13,9 @@ import {
   Container
 } from "@material-ui/core";
 import Circle, { CircleProps } from "react-circle";
-import ErrorIcon from "@material-ui/icons/Error";
 import { Account } from "../fakedata";
 import { Accounts } from "../App";
+import { OptimizationList } from "./Components/OptimizationList";
 import { useSpring, animated } from "react-spring";
 
 function getScores(accounts: Account[]) {
@@ -91,54 +91,11 @@ export const Homepage: React.FC<{}> = () => {
         <Box ml={2}>
           <Typography variant="h5">Alerts</Typography>
         </Box>
-        <List>
-          <NotificationListItem
-            primary="PSN-Database has been leaked"
-            secondary="Your account might be compromised.
-Change Password!"
-            onClick={() =>
-              modifyAccount("Google", {
-                compromised: true
-              })
-            }
-          ></NotificationListItem>
-          <Divider variant="inset" component="li" />
-          <NotificationListItem
-            primary="Inactive ‘Gutefrage.de’ Account detected"
-            secondary="Account last Activity 8 months ago
-          You might want to delete it."
-          ></NotificationListItem>
-
-          <Divider variant="inset" component="li" />
-          <NotificationListItem
-            primary="Spotify-Account Security can be upgraded"
-            secondary="Implement 2-Factor-Authentification"
-          ></NotificationListItem>
-        </List>
+        <OptimizationList></OptimizationList>
       </Box>
     </Box>
   );
 };
-
-function NotificationListItem(
-  props: {
-    icon?: ReactNode;
-    primary: string;
-    secondary: string;
-  } & any
-) {
-  const { icon, primary, secondary, ...listItemProps } = props;
-  return (
-    <ListItem alignItems="flex-start" {...listItemProps}>
-      <ListItemIcon>
-        <ListItemAvatar>
-          <Avatar>{icon ? icon : <ErrorIcon />}</Avatar>
-        </ListItemAvatar>
-      </ListItemIcon>
-      <ListItemText primary={primary} secondary={secondary} />
-    </ListItem>
-  );
-}
 
 const AnimatedProgressCircle = animated(ProgressCircle);
 
