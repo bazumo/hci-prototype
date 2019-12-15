@@ -1,6 +1,7 @@
 import React, { ReactNode } from "react";
 import { AccountList } from "../Components/AccountList";
-import { Box, Container } from "@material-ui/core";
+import { Box, Container} from "@material-ui/core";
+import TextField from '@material-ui/core/TextField';
 import Button from "@material-ui/core/Button";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
@@ -12,6 +13,7 @@ import MenuItem from "@material-ui/core/MenuItem";
 import FormControl from "@material-ui/core/FormControl";
 import Select from "@material-ui/core/Select";
 import { SingleAccountView } from "./SingleAccountView";
+import Grid from "@material-ui/core/Grid";
 import { Accounts } from "../App";
 
 export const AccountListView: React.FC<{}> = () => {
@@ -21,6 +23,7 @@ export const AccountListView: React.FC<{}> = () => {
 
   const [open, setOpen] = React.useState(false);
   const [twoFA, setTwoFA] = React.useState(0);
+  const [search, setSearch] = React.useState("");
   const [sort, setSort] = React.useState(0);
   const [username, setUsername] = React.useState(0);
   const [email, setEmail] = React.useState(0);
@@ -34,12 +37,24 @@ export const AccountListView: React.FC<{}> = () => {
     setOpen(false);
   };
 
+  const handleReset = () => {
+    setTwoFA(0);
+    setUsername(0);
+    setEmail(0);
+    setCompromised(0);
+  };
+
   return (
     <Box display="flex" justifyContent="center">
       <Box>
         <Container>
+          
+          
+          <Grid container spacing={3}>
+          <Grid item xs={6}>
           <p>Accountlist</p>
-
+          </Grid>
+          <Grid item xs={6}>
           <Button onClick={handleClickOpen}>Filter by</Button>
           <Dialog
             disableBackdropClick
@@ -132,15 +147,20 @@ export const AccountListView: React.FC<{}> = () => {
               </form>
             </DialogContent>
             <DialogActions>
-              <Button onClick={handleClose} color="primary">
-                Cancel
+              <Button onClick={handleReset} color="primary">
+                Clear
               </Button>
               <Button onClick={handleClose} color="primary">
                 Ok
               </Button>
             </DialogActions>
           </Dialog>
-          <AccountList sort={sort} twoFa={twoFA} compromised={compromised} email={email} username={username}></AccountList>
+          </Grid>
+          </Grid>
+          <form>
+              <TextField id="standard-basic" label="Search" value={search} onChange={e => setSearch(e.target.value as any)}/>
+          </form>
+          <AccountList sort={sort} twoFa={twoFA} compromised={compromised} email={email} username={username} search={search}></AccountList>
         </Container>
       </Box>
     </Box>
