@@ -12,10 +12,13 @@ import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import { SingleAccountView } from "./SingleAccountView";
+import { Accounts } from "../App";
 
 export const AccountListView: React.FC<{}> = () => {
   const [open, setOpen] = React.useState(false);
-  const [filter, setFilter] = React.useState(0);
+  const [twoFA, setTwoFA] = React.useState(0);
+  const [sort, setSort] = React.useState(0);
+  const [username, setUsername] = React.useState(0);
 
 
 
@@ -35,22 +38,40 @@ export const AccountListView: React.FC<{}> = () => {
 
         <Button onClick={handleClickOpen}>Filter by</Button>
           <Dialog disableBackdropClick disableEscapeKeyDown open={open} onClose={handleClose}>
-            <DialogTitle>Select a Filter</DialogTitle>
+            <DialogTitle>Sort By</DialogTitle>
 
             <DialogContent>
             <form>
               <FormControl>
-                <InputLabel id="filter-label">Age</InputLabel>
+                <InputLabel id="sort-label">Sort by</InputLabel>
                 <Select
-                  labelId="filter-label"
-                  id="filter-select"
-                  value={filter}
-                  onChange={(e) => setFilter(e.target.value as any)}
+                  labelId="sort-label"
+                  id="sort-select"
+                  value={sort}
+                  onChange={(e) => setSort(e.target.value as any)}
                   input={<Input />}
                 >
                   <MenuItem value={0}>name</MenuItem>
                   <MenuItem value={1}>email</MenuItem>
                   <MenuItem value={2}>date created</MenuItem>
+                  <MenuItem value={3}>last log in</MenuItem>
+                </Select>
+              </FormControl>
+            </form>
+            <DialogTitle>Filter By</DialogTitle>
+            <form>
+              <FormControl>
+                <InputLabel id="twoFA-label">2FA</InputLabel>
+                <Select
+                  labelId="twoFA-label"
+                  id="twoFA-select"
+                  value={twoFA}
+                  onChange={(e) => setTwoFA(e.target.value as any)}
+                  input={<Input />}
+                >
+                  <MenuItem value={0}>all</MenuItem>
+                  <MenuItem value={1}>enabled</MenuItem>
+                  <MenuItem value={2}>not enabled</MenuItem>
                 </Select>
               </FormControl>
             </form>
@@ -65,7 +86,7 @@ export const AccountListView: React.FC<{}> = () => {
             </DialogActions>
 
           </Dialog>
-        <AccountList filter={filter}></AccountList>
+        <AccountList sort={sort} twoFa={twoFA}></AccountList>
       </Container>
       </Box>
     </Box>
