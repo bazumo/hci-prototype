@@ -23,7 +23,7 @@ export const useStyles = makeStyles({
   }
 });
 
-export const AccountList: React.FC<{ sort: number; twoFa: number }> = props => {
+export const AccountList: React.FC<{ sort: number; twoFa: number, compromised: number, username: number, email : number}> = props => {
   const sorts = [
     (a: Account, b: Account): number =>
       a.id > b.id ? 1 : a.id < b.id ? -1 : 0,
@@ -42,10 +42,24 @@ export const AccountList: React.FC<{ sort: number; twoFa: number }> = props => {
   const history = useHistory();
   const classes = useStyles();
   const { accounts } = Accounts.useContainer();
-  const filtered_accounts = accounts.filter(a =>
+  const usernames = Array.from(new Set(accounts.map(a => a.username)));
+  const emails = Array.from(new Set(accounts.map(a => a.email)));
+
+  console.log(props.email);
+  console.log(emails[props.email-1]);
+
+  const filtered_accounts = accounts
+  .filter(a =>
     props.twoFa == 1 ? a.twoFA : props.twoFa == 2 ? !a.twoFA : true
+  )
+  .filter(a =>
+    props.compromised == 1 ? a.compromised : props.compromised == 2 ? !a.compromised : true 
+    )
+  .filter(a =>
+    props.username == 0 ? true : usernames[props.username-1] == a.username
+  ).filter(a =>
+    props.email == 0 ? true : emails[props.email-1] == a.email
   );
-  console.log(typeof accounts[0].logo);
 
   return (
     <List>

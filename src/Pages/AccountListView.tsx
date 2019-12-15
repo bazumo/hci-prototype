@@ -15,10 +15,16 @@ import { SingleAccountView } from "./SingleAccountView";
 import { Accounts } from "../App";
 
 export const AccountListView: React.FC<{}> = () => {
+  const {accounts} = Accounts.useContainer();
+  const usernames = Array.from(new Set(accounts.map(a => a.username)));
+  const emails = Array.from(new Set(accounts.map(a => a.email)));
+
   const [open, setOpen] = React.useState(false);
   const [twoFA, setTwoFA] = React.useState(0);
   const [sort, setSort] = React.useState(0);
   const [username, setUsername] = React.useState(0);
+  const [email, setEmail] = React.useState(0);
+  const [compromised, setCompromised] = React.useState(0);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -64,6 +70,52 @@ export const AccountListView: React.FC<{}> = () => {
               <DialogTitle>Filter By</DialogTitle>
               <form>
                 <FormControl>
+                  <InputLabel id="username-label">Username</InputLabel>
+                  <Select
+                    labelId="username-label"
+                    id="username-select"
+                    value={username}
+                    onChange={e => setUsername(e.target.value as any)}
+                    input={<Input />}
+                  >
+                    <MenuItem value={0}>all</MenuItem>
+                    {usernames.map((u,i) => <MenuItem value={i+1}>{u}</MenuItem>)}
+                  </Select>
+                </FormControl>
+              </form>
+              <form>
+                <FormControl>
+                  <InputLabel id="email-label">Email</InputLabel>
+                  <Select
+                    labelId="email-label"
+                    id="email-select"
+                    value={email}
+                    onChange={e => setEmail(e.target.value as any)}
+                    input={<Input />}
+                  >
+                    <MenuItem value={0}>all</MenuItem>
+                    {emails.map((u,i) => <MenuItem value={i+1}>{u}</MenuItem>)}
+                  </Select>
+                </FormControl>
+              </form>
+              <form>
+                <FormControl>
+                  <InputLabel id="compromised-label">Compromised</InputLabel>
+                  <Select
+                    labelId="compromised-label"
+                    id="compromised-select"
+                    value={compromised}
+                    onChange={e => setCompromised(e.target.value as any)}
+                    input={<Input />}
+                  >
+                    <MenuItem value={0}>all</MenuItem>
+                    <MenuItem value={1}>compromised</MenuItem>
+                    <MenuItem value={2}>not compromised</MenuItem>
+                  </Select>
+                </FormControl>
+              </form>
+              <form>
+                <FormControl>
                   <InputLabel id="twoFA-label">2FA</InputLabel>
                   <Select
                     labelId="twoFA-label"
@@ -88,7 +140,7 @@ export const AccountListView: React.FC<{}> = () => {
               </Button>
             </DialogActions>
           </Dialog>
-          <AccountList sort={sort} twoFa={twoFA}></AccountList>
+          <AccountList sort={sort} twoFa={twoFA} compromised={compromised} email={email} username={username}></AccountList>
         </Container>
       </Box>
     </Box>
