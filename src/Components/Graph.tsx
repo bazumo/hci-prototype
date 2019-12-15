@@ -6,6 +6,7 @@ import useWindowDimensions from "../Hooks/useWindowDimension";
 import { Accounts } from "../App";
 import { SimulationNodeDatum, SimulationLinkDatum } from "d3";
 import { useHistory } from "react-router-dom";
+import FilterIcon from "@material-ui/icons/FilterList";
 
 export const GraphWrapper: React.FC<{}> = () => {
   const { accounts } = Accounts.useContainer();
@@ -110,7 +111,11 @@ const TestGraph: React.FC<{ accounts: Account[] }> = ({ accounts }) => {
     window.scrollTo(width / 4, height / 4);
   }, [simulation]);
 
-  const handleSwitchMode = () => {};
+  const [open, setOpen] = React.useState(false);
+  const [mode, setMode] = React.useState(0);
+  const handleSwitchMode = () => {
+    setOpen(true);
+  };
 
   return (
     <div>
@@ -135,69 +140,9 @@ const TestGraph: React.FC<{ accounts: Account[] }> = ({ accounts }) => {
         aria-label="edit"
         //onClick={handleSwitchMode}
         style={{ position: "fixed", bottom: "80px", right: "20px" }}
-      ></Fab>
+      >
+        <FilterIcon />
+      </Fab>
     </div>
   );
 };
-
-/*
-
-class Graph extends React.Component<any, any> {
-  constructor(props) {
-    super(props);
-    this.state = this.getInitialState();
-  }
-  getInitialState() {
-    var svgWidth = 900;
-    var svgHeight = 900;
-    var force = d3.forceSimulation();
-
-    return {
-      svgWidth: svgWidth,
-      svgHeight: svgHeight,
-      force: force,
-      nodes: null,
-      links: null
-    };
-  }
-  componentDidMount() {
-    var self = this;
-    // refactor entire graph into sub component - force layout shouldn't be
-    // manipulating props, though this works
-    this.state.force
-      .nodes(this.props.lesmis.nodes)
-      .links(this.props.lesmis.links)
-      .start();
-    this.state.force.on("tick", function(tick, b, c) {
-      self.forceUpdate();
-    });
-  }
-  drawLinks() {
-    var links = this.props.lesmis.links.map(function(link, index) {
-      return <Link datum={link} key={index} />;
-    });
-    return <g>{links}</g>;
-  }
-  drawNodes() {
-    var nodes = this.props.lesmis.nodes.map(function(node, index) {
-      return <Node key={index} x={node.x} y={node.y} group={node.group} />;
-    });
-    return nodes;
-  }
-  render() {
-    return (
-      <div>
-        <div style={{ marginLeft: "20px", fontFamily: "Helvetica" }}></div>
-        <svg
-          style={{ border: "2px solid black", margin: "20px" }}
-          width={this.state.svgWidth}
-          height={this.state.svgHeight}
-        >
-          {this.drawLinks()}
-          {this.drawNodes()}
-        </svg>
-      </div>
-    );
-  }
-}
-*/
