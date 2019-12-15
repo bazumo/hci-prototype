@@ -20,13 +20,13 @@ import { useSpring, animated } from "react-spring";
 
 function getScores(accounts: Account[]) {
   const passwordScore =
-    accounts.reduce((acc, a) => acc + 90, 0) / accounts.length;
+    accounts.reduce((acc, a) => acc + (a.password.length > 12 ? 90 : a.password.length * 7), 0) / accounts.length;
   const accountScore =
-    accounts.reduce((acc, a) => acc + 30, 0) / accounts.length;
+    accounts.reduce((acc, a) => acc + 90 + (a.loggedIn ? -30 : 0) + (a.lastLoggedIn > new Date(2019, 12, 5) ? 30 : 0) + (a.lastLoggedIn < new Date(2019, 6, 12) ? -60 : 0), 0) / accounts.length;
   const protectionScore =
-    accounts.reduce((acc, a) => acc * (a.compromised ? 0.8 : 1), 1) * 90;
+    accounts.reduce((acc, a) => acc * (a.compromised ? 0.6 : 1), 1) * 90;
   const dependenyScore =
-    accounts.reduce((acc, a) => acc + 10, 0) / accounts.length;
+    accounts.reduce((acc, a) => acc + 50, 0) / accounts.length;
   const globalScore = Math.min(
     dependenyScore,
     protectionScore,
