@@ -1,10 +1,11 @@
-import { Box } from "@material-ui/core";
+import { Box, Fab } from "@material-ui/core";
 import React, { useEffect, useRef, useState, useLayoutEffect } from "react";
 import * as d3 from "d3";
 import { Account } from "../fakedata";
 import useWindowDimensions from "../Hooks/useWindowDimension";
 import { Accounts } from "../App";
 import { SimulationNodeDatum, SimulationLinkDatum } from "d3";
+import { useHistory } from "react-router-dom";
 
 export const GraphWrapper: React.FC<{}> = () => {
   const { accounts } = Accounts.useContainer();
@@ -19,37 +20,34 @@ export const GraphWrapper: React.FC<{}> = () => {
 const color = d3.schemeCategory10;
 
 const Node: React.FC<NodeType> = props => {
+  const history = useHistory();
   return (
-    <circle
-      r={5}
-      cx={props.x}
-      cy={props.y}
+    <Fab
       style={{
-        stroke: "#fff",
-        strokeWidth: "1.5px"
+        top: props.y,
+        left: props.x,
+        position: "absolute",
+        backgroundImage: `url(${props.logo})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center"
       }}
-    >
-      <image
-        href={props.logo ? props.logo : ""}
-        x="0"
-        y="0"
-        height="50px"
-        width="50px"
-      />
-    </circle>
+      size="large"
+      onClick={() => history.push(`/account/${props.id}`)}
+    ></Fab>
   );
 };
 
 const Link: React.FC<{ link: any }> = ({ link }) => {
   return (
     <line
-      x1={link.source.x}
-      y1={link.source.y}
-      x2={link.target.x}
-      y2={link.target.y}
+      x1={link.source.x + 40}
+      y1={link.source.y + 100}
+      x2={link.target.x + 40}
+      y2={link.target.y + 100}
       style={{
-        stroke: "#999",
-        strokeOpacity: 0.6
+        stroke: "#900",
+        strokeOpacity: 1,
+        strokeWidth: 5
       }}
     />
   );
@@ -86,15 +84,15 @@ const TestGraph: React.FC<{ accounts: Account[] }> = ({ accounts }) => {
         "charge",
         d3
           .forceManyBody()
-          .distanceMin(50)
-          .distanceMax(100)
+          .distanceMin(80)
+          .distanceMax(80)
       )
       .force("center", d3.forceCenter())
       .force(
         "link",
         d3
           .forceLink(links)
-          .distance(1)
+          .distance(50)
           .strength(0.1)
       )
   );
@@ -108,17 +106,24 @@ const TestGraph: React.FC<{ accounts: Account[] }> = ({ accounts }) => {
 
   return (
     <div>
-      <div style={{ marginLeft: "20px", fontFamily: "Helvetica" }}></div>
-      <svg
-        style={{ border: "2px solid black" }}
-        width={width}
-        height={height}
-        viewBox={`${-height / 2} ${-width / 2} ${height} ${width}`}
+      <div
+        style={{
+          width,
+          height,
+          position: "relative",
+          transform: "translate(50%, 50%)"
+        }}
       >
         {nodes.map(node => (
           <Node {...node}></Node>
         ))}
-
+      </div>
+      <svg
+        style={{ position: "absolute", top: "0" }}
+        width={width}
+        height={height}
+        viewBox={`${-height / 2} ${-width / 2} ${height} ${width}`}
+      >
         {links.map(link => (
           <Link link={link}></Link>
         ))}

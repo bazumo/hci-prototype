@@ -1,12 +1,14 @@
 import React, { ReactNode } from "react";
 import { Account } from "../fakedata";
-import { Box, Container } from "@material-ui/core";
+import { Box, Container, Avatar } from "@material-ui/core";
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
 import Paper from "@material-ui/core/Paper";
 import Divider from "@material-ui/core/Divider";
 import Grid from "@material-ui/core/Grid";
 import Link from "@material-ui/core/Link";
+import NoEncryptionIcon from "@material-ui/icons/NoEncryption";
+import SecurityIcon from "@material-ui/icons/Security";
 import ReactDOM from "react-dom";
 import {
   BrowserRouter as Router,
@@ -26,17 +28,31 @@ export const SingleAccountView: React.FC<{}> = props => {
     <Container>
       <Box display="flex" justifyContent="center">
         <Box>
-          {typeof a.backgroundImage === "string" && (
-            <img
-              src={a.backgroundImage}
-              style={{ objectFit: "cover", width: "100vw", height: "200px" }}
-            ></img>
-          )}
-          {typeof a.backgroundImage !== "string" && (
-            <Box width="100vw" height="200px">
-              {a.backgroundImage}
-            </Box>
-          )}
+          <div
+            style={{
+              backgroundSize: "cover",
+              width: "100vw",
+              height: "200px",
+              backgroundImage: `url(${a.backgroundImage})`,
+              backgroundPosition: "center",
+              display: "flex",
+              alignItems: "flex-end",
+              justifyContent: "flex-end"
+            }}
+          >
+            {a.compromised && (
+              <Avatar>
+                <NoEncryptionIcon></NoEncryptionIcon>
+              </Avatar>
+            )}
+            {a.supportsTwoFA && (
+              <Avatar>
+                <SecurityIcon
+                  color={a.twoFA ? "primary" : undefined}
+                ></SecurityIcon>
+              </Avatar>
+            )}
+          </div>
           <Typography variant="h4" gutterBottom>
             <Grid container spacing={3}>
               <Grid item xs={4}>

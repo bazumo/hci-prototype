@@ -286,7 +286,7 @@ export const accounts: Account[] = [
     url: "https://www.apple.com",
     username: "sai murray",
     email: "saimurray@outlook.com",
-    password: "fsfsf24224ad",
+    password: "adasdasd",
     created: new Date(2012, 9, 22),
     lastLoggedIn: new Date(2019, 7, 2),
     logo:
@@ -326,7 +326,7 @@ export const accounts: Account[] = [
     url: "www.nytimes.com/",
     username: "sai murray",
     email: "saimurray@outlook.com",
-    password: "hackedpassword",
+    password: "hackedpassw",
     created: new Date(2011, 6, 18),
     lastLoggedIn: new Date(2017, 11, 23),
     logo:
@@ -346,7 +346,7 @@ export const accounts: Account[] = [
     url: "https://www.sbb.ch",
     username: "sai murray",
     email: "saimurray@outlook.com",
-    password: "fsfsf24224ad",
+    password: "sdsdas",
     created: new Date(2018, 2, 3),
     lastLoggedIn: new Date(2019, 12, 8),
     logo:
@@ -494,6 +494,45 @@ export const accounts: Account[] = [
     supportsTwoFA: false,
     compromised: false,
     loggedIn: true,
+    loginGraph: [0, 0, 0, 0, 0, 0, 0]
+  },
+  {
+    ...defaultData,
+    id: "Twitch",
+    score: 92,
+    url: "https://www.twitch.tv/",
+    username: "rumsai2145",
+    email: "saimurray@gmail.com",
+    password: "ZULUL123fffffffff",
+    created: new Date(2015, 9, 22),
+    lastLoggedIn: new Date(2019, 12, 10),
+    logo:
+      "https://static.twitchcdn.net/assets/mobile_iphone-f86cf40b17fec4d2a70d.png",
+    backgroundImage:
+      "https://cdn.vox-cdn.com/thumbor/6J3WM48-xsYlIK6VVobexsmqQoc=/0x0:2400x1600/920x613/filters:focal(1008x608:1392x992):format(webp)/cdn.vox-cdn.com/uploads/chorus_image/image/65517540/01_Twitch_Logo.0.jpg",
+    twoFA: false,
+    supportsTwoFA: false,
+    compromised: false,
+    loggedIn: true,
+    loginGraph: [0, 0, 0, 0, 0, 0, 0]
+  },
+  {
+    ...defaultData,
+    id: "StackOverflow",
+    score: 92,
+    url: "https://stackoverflow.com/",
+    username: "saimur96",
+    email: "saimurray@gmail.com",
+    password: "klashdiuwh1i23",
+    created: new Date(2015, 3, 12),
+    lastLoggedIn: new Date(2017, 12, 5),
+    logo:
+      "https://p1.hiclipart.com/preview/405/70/383/flat-gradient-social-media-icons-stackoverflow-stack-overflow-logo-png-clipart.jpg",
+    backgroundImage: "https://i.stack.imgur.com/440u9.png",
+    twoFA: false,
+    supportsTwoFA: false,
+    compromised: false,
+    loggedIn: false,
     loginGraph: [0, 0, 0, 0, 0, 0, 0]
   }
 ];
