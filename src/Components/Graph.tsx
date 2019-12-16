@@ -1,11 +1,12 @@
-import { Box, Fab, TextField } from "@material-ui/core";
-import React, { useEffect, useRef, useState, useLayoutEffect } from "react";
+import { Avatar, Box, Fab } from "@material-ui/core";
+import ErrorIcon from "@material-ui/icons/Error";
 import * as d3 from "d3";
-import { Account, defaultData } from "../fakedata";
-import useWindowDimensions from "../Hooks/useWindowDimension";
-import { Accounts } from "../App";
-import { SimulationNodeDatum, SimulationLinkDatum } from "d3";
+import { SimulationLinkDatum, SimulationNodeDatum } from "d3";
+import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
+import { Accounts } from "../App";
+import { Account } from "../fakedata";
+import useWindowDimensions from "../Hooks/useWindowDimension";
 import { FilterButton } from "./FilterButton";
 
 export const GraphWrapper: React.FC<{}> = () => {
@@ -32,7 +33,19 @@ const Node: React.FC<NodeType> = props => {
       }}
       size="large"
       onClick={() => history.push(`/account/${props.id}`)}
-    ></Fab>
+    >
+      {props.compromised && (
+        <Avatar
+          style={{
+            width: "16px",
+            height: "16px",
+            transform: "translate(20px, -20px)"
+          }}
+        >
+          <ErrorIcon color="secondary" />
+        </Avatar>
+      )}
+    </Fab>
   );
 };
 
@@ -250,8 +263,6 @@ const TestGraph: React.FC<{ accounts: Account[] }> = ({ accounts }) => {
 
   const partitions = partition[mode](nodes);
 
-  console.log(partitions);
-
   function get_point(n: NodeType, angle: number) {
     let radius = 40;
     return [n.x! + radius * Math.cos(angle), n.y! + radius * Math.sin(angle)];
@@ -282,7 +293,7 @@ const TestGraph: React.FC<{ accounts: Account[] }> = ({ accounts }) => {
             return (
               <Hull
                 points={hull}
-                color={d3.interpolateSinebow(i / hulls.length)}
+                color={d3.interpolateRainbow(i / hulls.length)}
               ></Hull>
             );
           }
@@ -305,7 +316,11 @@ const TestGraph: React.FC<{ accounts: Account[] }> = ({ accounts }) => {
         </div>
       </div>
 
-      <svg style={{ position: "absolute" }} width={width} height={height}>
+      <svg
+        style={{ position: "absolute", pointerEvents: "none" }}
+        width={width}
+        height={height}
+      >
         {hulls.map(([label, hull]) => {
           if (hull) {
             return <Label points={hull} text={label}></Label>;

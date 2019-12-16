@@ -1,22 +1,10 @@
-import React, { ReactNode } from "react";
-import {
-  Box,
-  CircularProgress,
-  List,
-  ListItem,
-  ListItemAvatar,
-  Avatar,
-  ListItemText,
-  Typography,
-  Divider,
-  ListItemIcon,
-  Container
-} from "@material-ui/core";
+import { Box, Container, Typography } from "@material-ui/core";
+import React from "react";
 import Circle, { CircleProps } from "react-circle";
-import { Account } from "../fakedata";
+import { animated, useSpring } from "react-spring";
 import { Accounts } from "../App";
 import { OptimizationList } from "../Components/OptimizationList";
-import { useSpring, animated } from "react-spring";
+import { Account } from "../fakedata";
 
 function getScores(accounts: Account[]) {
   const email_count = e =>
