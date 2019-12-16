@@ -52,23 +52,39 @@ const Link: React.FC<{ link: any }> = ({ link }) => {
   );
 };
 
-
-
-const Label: React.FC<{ point: [number,number], text: string }> = ({ point, text }) => {
+const Label: React.FC<{ points: [number, number][]; text: string }> = ({
+  points,
+  text
+}) => {
+  const p = points.reduce((max, point) => (max[1] > point[1] ? point : max), [
+    Infinity,
+    Infinity
+  ]);
+  // const p = d3.polygonCentroid(points);
   return (
-  <text x={point[0]} y={point[1]} fill="rgba(0,0,0,0.4)" fontWeight="bold" fontSize="18px">{text}</text>
-
+    <text
+      x={p[0] - 30}
+      y={p[1] - 10}
+      fill="rgba(0,0,0,0.4)"
+      fontWeight="bold"
+      fontSize="12px"
+    >
+      {text}
+    </text>
   );
 };
 
-const Hull: React.FC<{ points: [number, number][] }> = ({ points }) => {
+const Hull: React.FC<{ points: [number, number][]; color: string }> = ({
+  points,
+  color
+}) => {
   return (
     <path
       d={"M" + points.join("L") + "Z"}
       style={{
         stroke: "#AAAAAA",
-        fill: "#EEEEEE",
-        fillOpacity: 1,
+        fill: color,
+        fillOpacity: 0.2,
         strokeOpacity: 1,
         strokeWidth: 2
       }}
@@ -125,13 +141,13 @@ const filterMap: Record<Mode, (a: Account, b: Account) => boolean> = {
   created: (a1, a2) => a1.created.getFullYear() == a2.created.getFullYear()
 };
 
-const partition: Record<Mode, (nodes: NodeType[]) => NodeType[][]> = {
+const partition: Record<Mode, (nodes: NodeType[]) => [string, NodeType[]][]> = {
   email: nodes => {
     const groups = {};
     nodes.forEach(n => {
       groups[n.email] = groups[n.email] ? [...groups[n.email], n] : [n];
     });
-    return Object.values(groups);
+    return Object.entries(groups);
   },
   username: nodes => {
     const groups = {};
@@ -140,7 +156,7 @@ const partition: Record<Mode, (nodes: NodeType[]) => NodeType[][]> = {
         ? [...groups[n.username], n]
         : [n];
     });
-    return Object.values(groups);
+    return Object.entries(groups);
   },
   password: nodes => {
     const groups = {};
@@ -149,11 +165,36 @@ const partition: Record<Mode, (nodes: NodeType[]) => NodeType[][]> = {
         ? [...groups[n.password], n]
         : [n];
     });
-    return Object.values(groups);
+    return Object.entries(groups);
   },
-  "2fa": nodes => [nodes],
-  last_login: nodes => [nodes],
-  created: nodes => [nodes]
+  "2fa": nodes => {
+    const groups = {};
+    nodes.forEach(n => {
+      const key = !n.supportsTwoFA
+        ? "does not support 2FA"
+        : n.twoFA
+        ? "has 2FA enabled"
+        : "does not use 2FA";
+      groups[key] = groups[key] ? [...groups[key], n] : [n];
+    });
+    return Object.entries(groups);
+  },
+  last_login: nodes => {
+    const groups = {};
+    nodes.forEach(n => {
+      const key = n.created.getFullYear() + "/" + n.created.getMonth();
+      groups[key] = groups[key] ? [...groups[key], n] : [n];
+    });
+    return Object.entries(groups);
+  },
+  created: nodes => {
+    const groups = {};
+    nodes.forEach(n => {
+      const key = n.created.getFullYear();
+      groups[key] = groups[key] ? [...groups[key], n] : [n];
+    });
+    return Object.entries(groups);
+  }
 };
 
 type NodeType = SimulationNodeDatum & Account;
@@ -211,67 +252,65 @@ const TestGraph: React.FC<{ accounts: Account[] }> = ({ accounts }) => {
 
   console.log(partitions);
 
-  function get_point (n: NodeType, angle: number) {
+  function get_point(n: NodeType, angle: number) {
     let radius = 40;
-    return [n.x! + radius *  Math.cos(angle), n.y! + radius *  Math.sin(angle)]
+    return [n.x! + radius * Math.cos(angle), n.y! + radius * Math.sin(angle)];
   }
 
-  function get_points (n: NodeType) {
+  function get_points(n: NodeType) {
     const STEPS = 18;
     let res = new Array(STEPS);
     for (let i = 0; i < STEPS; i++) {
-      res[i] = get_point(n, i*2*Math.PI/STEPS);
+      res[i] = get_point(n, (i * 2 * Math.PI) / STEPS);
     }
     return res;
   }
 
-  const hulls = partitions.map((nodeSet: NodeType[]) =>
-    d3.polygonHull(
-      nodeSet
-        .map(n => 
-          get_points(n)
-        )
-        .flat() as any
-    )
+  const hulls = partitions.map(
+    ([label, nodeSet]) =>
+      [
+        label,
+        d3.polygonHull(nodeSet.map(n => get_points(n)).flat() as any)
+      ] as any
   );
 
   return (
     <div>
       <svg style={{ position: "absolute" }} width={width} height={height}>
-        {hulls.map(hull => {
+        {hulls.map(([label, hull], i) => {
           if (hull) {
-            return (<Hull points={hull}></Hull>);
+            return (
+              <Hull
+                points={hull}
+                color={d3.interpolateSinebow(i / hulls.length)}
+              ></Hull>
+            );
           }
         })}
         {links.map(link => (
           <Link link={link}></Link>
         ))}
-         
       </svg>
-      <div style={{position:"absolute"}}>
-      <div
-        style={{
-          width,
-          height,
-          position: "relative"
-        }}
-      >
-        {nodes.map(node => (
-          <Node {...node}></Node>
-        ))}
-       
+      <div style={{ position: "absolute" }}>
+        <div
+          style={{
+            width,
+            height,
+            position: "relative"
+          }}
+        >
+          {nodes.map(node => (
+            <Node {...node}></Node>
+          ))}
+        </div>
       </div>
-      </div>
-    
 
       <svg style={{ position: "absolute" }} width={width} height={height}>
-        
-         {hulls.map(
-          hull => {
-            if (hull) {
-              const p = hull.sort((a,b) => a[1] < b[1] ? -1 : (a[1] > b[1] ? 1: 0))[0];
-              return <Label point={p} text={"hello"}></Label>}}
-        )}
+        {hulls.map(([label, hull]) => {
+          if (hull) {
+            return <Label points={hull} text={label}></Label>;
+          }
+        })}
       </svg>
       <FilterButton mode={mode} setMode={setMode}></FilterButton>
     </div>
