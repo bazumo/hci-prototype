@@ -322,7 +322,7 @@ const TestGraph: React.FC<{ accounts: Account[] }> = ({ accounts }) => {
         height={height}
       >
         {hulls.map(([label, hull]) => {
-          if (hull) {
+          if (hull && mode != "password") {
             return <Label points={hull} text={label}></Label>;
           }
         })}
