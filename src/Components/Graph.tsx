@@ -1,4 +1,4 @@
-import { Box, Fab, Dialog, DialogTitle, TextField, DialogContent, MenuItem, Input, InputLabel, FormControl, DialogActions, Select, Button } from "@material-ui/core";
+import { Box, Fab, TextField } from "@material-ui/core";
 import React, { useEffect, useRef, useState, useLayoutEffect } from "react";
 import * as d3 from "d3";
 import { Account, defaultData } from "../fakedata";
@@ -6,7 +6,7 @@ import useWindowDimensions from "../Hooks/useWindowDimension";
 import { Accounts } from "../App";
 import { SimulationNodeDatum, SimulationLinkDatum } from "d3";
 import { useHistory } from "react-router-dom";
-import FilterIcon from "@material-ui/icons/FilterList";
+import { FilterButton } from "./FilterButton";
 
 export const GraphWrapper: React.FC<{}> = () => {
   const { accounts } = Accounts.useContainer();
@@ -23,8 +23,8 @@ const Node: React.FC<NodeType> = props => {
   return (
     <Fab
       style={{
-        top: props.y,
-        left: props.x,
+        top: props.y! - 25,
+        left: props.x! - 25,
         position: "absolute",
         backgroundImage: `url(${props.logo})`,
         backgroundSize: "cover",
@@ -32,23 +32,117 @@ const Node: React.FC<NodeType> = props => {
       }}
       size="large"
       onClick={() => history.push(`/account/${props.id}`)}
-    ></Fab>)
+    ></Fab>
+  );
 };
 
 const Link: React.FC<{ link: any }> = ({ link }) => {
   return (
     <line
-      x1={link.source.x + 25}
-      y1={link.source.y + 25}
-      x2={link.target.x + 25}
-      y2={link.target.y + 25}
+      x1={link.source.x}
+      y1={link.source.y}
+      x2={link.target.x}
+      y2={link.target.y}
       style={{
         stroke: "#900",
-        strokeOpacity: 0,
+        strokeOpacity: 1,
         strokeWidth: 5
       }}
     />
   );
+};
+
+const Hull: React.FC<{ points: [number, number][] }> = ({ points }) => {
+  return (
+    <path
+      d={"M" + points.join("L") + "Z"}
+      style={{
+        stroke: "#009",
+        strokeOpacity: 1,
+        strokeWidth: 5
+      }}
+    />
+  );
+};
+
+function SimluationFactory(
+  nodes: NodeType[],
+  links: LinkType[],
+  width: number,
+  height: number
+) {
+  return d3
+    .forceSimulation(nodes)
+    .force(
+      "charge",
+      d3
+        .forceManyBody()
+        .distanceMin(100)
+        .distanceMax(200)
+    )
+    .force("center", d3.forceCenter(width / 2, height / 2))
+    .force(
+      "link",
+      d3
+        .forceLink(links)
+        .distance(100)
+        .strength(0.01)
+    )
+    .alphaMin(0.2)
+    .alphaDecay(0.05);
+}
+
+export type Mode =
+  | "email"
+  | "username"
+  | "password"
+  | "2fa"
+  | "last_login"
+  | "created";
+
+const filterMap: Record<Mode, (a: Account, b: Account) => boolean> = {
+  email: (a, b) => a.email === b.email,
+  username: (a, b) => a.username === b.username,
+  password: (a, b) => a.password === b.password,
+  "2fa": (a1, a2) =>
+    a1.supportsTwoFA == a2.supportsTwoFA && a1.supportsTwoFA
+      ? a1.twoFA === a2.twoFA
+      : a1.supportsTwoFA == a2.supportsTwoFA,
+  last_login: (a1, a2) =>
+    a1.lastLoggedIn.getFullYear() == a2.lastLoggedIn.getFullYear() &&
+    a1.lastLoggedIn.getMonth() == a2.lastLoggedIn.getMonth(),
+  created: (a1, a2) => a1.created.getFullYear() == a2.created.getFullYear()
+};
+
+const partition: Record<Mode, (nodes: NodeType[]) => NodeType[][]> = {
+  email: nodes => {
+    const groups = {};
+    nodes.forEach(n => {
+      groups[n.email] = groups[n.email] ? [...groups[n.email], n] : [n];
+    });
+    return Object.values(groups);
+  },
+  username: nodes => {
+    const groups = {};
+    nodes.forEach(n => {
+      groups[n.username] = groups[n.username]
+        ? [...groups[n.username], n]
+        : [n];
+    });
+    return Object.values(groups);
+  },
+  password: nodes => {
+    const groups = {};
+    nodes.forEach(n => {
+      groups[n.password] = groups[n.password]
+        ? [...groups[n.password], n]
+        : [n];
+    });
+    return Object.values(groups);
+  },
+  "2fa": nodes => [nodes],
+  last_login: nodes => [nodes],
+  created: nodes => [nodes]
 };
 
 type NodeType = SimulationNodeDatum & Account;
@@ -57,11 +151,12 @@ type LinkType = SimulationLinkDatum<NodeType>;
 const TestGraph: React.FC<{ accounts: Account[] }> = ({ accounts }) => {
   const parentSize = useWindowDimensions();
 
-  const [open, setOpen] = React.useState(false);
-  const [mode, setMode] = React.useState(1);
+  const [mode, setMode] = React.useState("username" as Mode);
 
   const height = parentSize.height * 2;
   const width = parentSize.width * 2;
+
+  const [links, setLinks] = useState([] as LinkType[]);
   const [nodes, setNodes] = useState(
     accounts.map((a, i) => ({
       index: i,
@@ -71,47 +166,27 @@ const TestGraph: React.FC<{ accounts: Account[] }> = ({ accounts }) => {
     })) as NodeType[]
   );
 
-  const passwordDependencies: LinkType[] = [];
-
-  accounts.forEach((a1, i) => {
-    accounts.forEach((a2, j) => {
-      if (i !== j) {
-        let b: boolean = mode == 0 && a1.password === a2.password;
-        b = b || (mode == 1 && a1.email === a2.email);
-        b = b || (mode == 2 && a1.username === a2.username);
-        b = b || (mode == 3 && ((a1.supportsTwoFA == a2.supportsTwoFA && a1.supportsTwoFA) ? a1.twoFA === a2.twoFA : a1.supportsTwoFA == a2.supportsTwoFA));
-        b = b || (mode == 4 && a1.lastLoggedIn.getFullYear() == a2.lastLoggedIn.getFullYear() && a1.lastLoggedIn.getMonth() == a2.lastLoggedIn.getMonth());
-        b = b || (mode == 5 && a1.created.getFullYear() == a2.created.getFullYear());
-        if (b) {
-          passwordDependencies.push({ source: i, target: j });
-        }
-      }
-    });
-  });
-
-  const [links, setLinks] = useState(passwordDependencies);
-
   const [simulation, setSimulation] = useState(
-    d3
-      .forceSimulation(nodes)
-      .force(
-        "charge",
-        d3
-          .forceManyBody()
-          .distanceMin(100)
-          .distanceMax(200)
-      )
-      .force("center", d3.forceCenter(width / 2, height / 2))
-      .force(
-        "link",
-        d3
-          .forceLink(links)
-          .distance(100)
-          .strength(0.01)
-      )
-      .alphaMin(0.2)
-      .alphaDecay(0.05)
+    SimluationFactory(nodes, links, width, height)
   );
+
+  useEffect(() => {
+    const dependencyLinks: LinkType[] = [];
+
+    accounts.forEach((a1, i) => {
+      accounts.forEach((a2, j) => {
+        if (i !== j) {
+          if (filterMap[mode](a1, a2)) {
+            dependencyLinks.push({ source: i, target: j });
+          }
+        }
+      });
+    });
+
+    setLinks(dependencyLinks);
+    setSimulation(SimluationFactory(nodes, links, width, height));
+    window.scrollTo(width / 4, height / 4);
+  }, [mode]);
 
   useEffect(() => {
     simulation.on("tick", () => {
@@ -121,22 +196,31 @@ const TestGraph: React.FC<{ accounts: Account[] }> = ({ accounts }) => {
     window.scrollTo(width / 4, height / 4);
   }, [simulation]);
 
-  useEffect(() => {
-    window.scrollTo(width / 4, height / 4);
-    // update graph
-  }, [mode]);
+  const partitions = partition[mode](nodes);
 
-  const handleSwitchMode = () => {
-    setOpen(true);
-  };
+  console.log(partitions);
 
-  const handleClose = () => {
-    setOpen(false);
-  };
+  const hulls = partitions.map((nodeSet: NodeType[]) =>
+    d3.polygonHull(
+      nodeSet
+        .map(n => [
+          [n.x! - 25, n.y! - 25],
+          [n.x! + 25, n.y! + 25],
+          [n.x! - 25, n.y! + 25],
+          [n.x! + 25, n.y! - 25]
+        ])
+        .flat() as any
+    )
+  );
 
   return (
     <div>
       <svg style={{ position: "absolute" }} width={width} height={height}>
+        {hulls.map(hull => {
+          if (hull) {
+            return <Hull points={hull}></Hull>;
+          }
+        })}
         {links.map(link => (
           <Link link={link}></Link>
         ))}
@@ -152,48 +236,7 @@ const TestGraph: React.FC<{ accounts: Account[] }> = ({ accounts }) => {
           <Node {...node}></Node>
         ))}
       </div>
-      <Dialog
-      disableBackdropClick
-      disableEscapeKeyDown
-      open={open}
-      onClose={() => {setOpen(false)}}
-      >
-        <DialogTitle>Choose Graph view</DialogTitle>
-        <DialogContent style={{ minWidth: "350px" }}>
-          <form>
-            <FormControl>
-              <InputLabel id="mode-label">Sort by</InputLabel>
-                <Select
-                  labelId="mode-label"
-                  id="mode-select"
-                  value={mode}
-                  onChange={e => setMode(e.target.value as any)}
-                  input={<Input />}
-                >
-                  <MenuItem value={0}>password</MenuItem>
-                  <MenuItem value={1}>email</MenuItem>
-                  <MenuItem value={2}>username</MenuItem>
-                  <MenuItem value={3}>2FA</MenuItem>
-                  <MenuItem value={4}>Last log-in (Month)</MenuItem>
-                  <MenuItem value={5}>Created (Year)</MenuItem>
-                </Select>
-              </FormControl>
-            </form>
-        </DialogContent>
-        <DialogActions>
-            <Button onClick={handleClose} color="primary">
-              Ok
-            </Button>
-        </DialogActions>
-      </Dialog>
-      <Fab
-        color="primary"
-        aria-label="edit"
-        onClick={handleSwitchMode}
-        style={{ position: "fixed", bottom: "80px", right: "20px" }}
-      >
-        <FilterIcon />
-      </Fab>
+      <FilterButton mode={mode} setMode={setMode}></FilterButton>
     </div>
   );
 };
