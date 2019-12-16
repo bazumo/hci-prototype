@@ -23,7 +23,7 @@ export interface Account {
   loginGraph: number[];
 }
 
-const defaultData: Account = {
+export const defaultData: Account = {
   id: "Account Name",
   score: 100,
   url: "",
