@@ -58,7 +58,7 @@ const Link: React.FC<{ link: any }> = ({ link }) => {
       y2={link.target.y}
       style={{
         stroke: "#900",
-        strokeOpacity: 1,
+        strokeOpacity: 0,
         strokeWidth: 5
       }}
     />
