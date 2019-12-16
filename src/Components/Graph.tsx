@@ -58,7 +58,7 @@ const Link: React.FC<{ link: any }> = ({ link }) => {
       y2={link.target.y}
       style={{
         stroke: "#900",
-        strokeOpacity: 0,
+        strokeOpacity: 1,
         strokeWidth: 5
       }}
     />
@@ -129,7 +129,7 @@ function SimluationFactory(
         .strength(0.01)
     )
     .alphaMin(0.2)
-    .alphaDecay(0.05);
+    .alphaDecay(0.04);
 }
 
 export type Mode =

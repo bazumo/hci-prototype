@@ -60,7 +60,7 @@ export const SingleAccountView: React.FC<{}> = props => {
       </div>
       <Container>
         <Box display="flex">
-          <Typography variant="h4" gutterBottom>
+          <Typography variant="h4" gutterBottom style={{ marginTop: "10px" }}>
             {a.id}
           </Typography>
           <Button href={a.url} style={{ marginLeft: "auto" }} color="primary">
@@ -77,7 +77,7 @@ export const SingleAccountView: React.FC<{}> = props => {
           </Button>
         </Box>
 
-        <Typography variant="h6" gutterBottom>
+        <Typography variant="h6" gutterBottom style={{ marginTop: "10px" }}>
           Account Information
         </Typography>
 
