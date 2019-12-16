@@ -52,6 +52,15 @@ const Link: React.FC<{ link: any }> = ({ link }) => {
   );
 };
 
+
+
+const Label: React.FC<{ point: [number,number], text: string }> = ({ point, text }) => {
+  return (
+  <text x={point[0]} y={point[1]} fill="rgba(0,0,0,0.4)" fontWeight="bold" fontSize="18px">{text}</text>
+
+  );
+};
+
 const Hull: React.FC<{ points: [number, number][] }> = ({ points }) => {
   return (
     <path
@@ -59,7 +68,7 @@ const Hull: React.FC<{ points: [number, number][] }> = ({ points }) => {
       style={{
         stroke: "#AAAAAA",
         fill: "#EEEEEE",
-        fillOpacity: 0.5,
+        fillOpacity: 1,
         strokeOpacity: 1,
         strokeWidth: 2
       }}
@@ -231,13 +240,15 @@ const TestGraph: React.FC<{ accounts: Account[] }> = ({ accounts }) => {
       <svg style={{ position: "absolute" }} width={width} height={height}>
         {hulls.map(hull => {
           if (hull) {
-            return <Hull points={hull}></Hull>;
+            return (<Hull points={hull}></Hull>);
           }
         })}
         {links.map(link => (
           <Link link={link}></Link>
         ))}
+         
       </svg>
+      <div style={{position:"absolute"}}>
       <div
         style={{
           width,
@@ -248,7 +259,20 @@ const TestGraph: React.FC<{ accounts: Account[] }> = ({ accounts }) => {
         {nodes.map(node => (
           <Node {...node}></Node>
         ))}
+       
       </div>
+      </div>
+    
+
+      <svg style={{ position: "absolute" }} width={width} height={height}>
+        
+         {hulls.map(
+          hull => {
+            if (hull) {
+              const p = hull.sort((a,b) => a[1] < b[1] ? -1 : (a[1] > b[1] ? 1: 0))[0];
+              return <Label point={p} text={"hello"}></Label>}}
+        )}
+      </svg>
       <FilterButton mode={mode} setMode={setMode}></FilterButton>
     </div>
   );
