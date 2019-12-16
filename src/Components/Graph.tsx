@@ -45,10 +45,19 @@ const Link: React.FC<{ link: any }> = ({ link }) => {
       y2={link.target.y}
       style={{
         stroke: "#900",
-        strokeOpacity: 1,
+        strokeOpacity: 0,
         strokeWidth: 5
       }}
     />
+  );
+};
+
+
+
+const Label: React.FC<{ point: [number,number], text: string }> = ({ point, text }) => {
+  return (
+  <text x={point[0]} y={point[1]} fill="rgba(0,0,0,0.4)" fontWeight="bold" fontSize="18px">{text}</text>
+
   );
 };
 
@@ -57,9 +66,11 @@ const Hull: React.FC<{ points: [number, number][] }> = ({ points }) => {
     <path
       d={"M" + points.join("L") + "Z"}
       style={{
-        stroke: "#009",
+        stroke: "#AAAAAA",
+        fill: "#EEEEEE",
+        fillOpacity: 1,
         strokeOpacity: 1,
-        strokeWidth: 5
+        strokeWidth: 2
       }}
     />
   );
@@ -200,15 +211,26 @@ const TestGraph: React.FC<{ accounts: Account[] }> = ({ accounts }) => {
 
   console.log(partitions);
 
+  function get_point (n: NodeType, angle: number) {
+    let radius = 40;
+    return [n.x! + radius *  Math.cos(angle), n.y! + radius *  Math.sin(angle)]
+  }
+
+  function get_points (n: NodeType) {
+    const STEPS = 18;
+    let res = new Array(STEPS);
+    for (let i = 0; i < STEPS; i++) {
+      res[i] = get_point(n, i*2*Math.PI/STEPS);
+    }
+    return res;
+  }
+
   const hulls = partitions.map((nodeSet: NodeType[]) =>
     d3.polygonHull(
       nodeSet
-        .map(n => [
-          [n.x! - 25, n.y! - 25],
-          [n.x! + 25, n.y! + 25],
-          [n.x! - 25, n.y! + 25],
-          [n.x! + 25, n.y! - 25]
-        ])
+        .map(n => 
+          get_points(n)
+        )
         .flat() as any
     )
   );
@@ -218,13 +240,15 @@ const TestGraph: React.FC<{ accounts: Account[] }> = ({ accounts }) => {
       <svg style={{ position: "absolute" }} width={width} height={height}>
         {hulls.map(hull => {
           if (hull) {
-            return <Hull points={hull}></Hull>;
+            return (<Hull points={hull}></Hull>);
           }
         })}
         {links.map(link => (
           <Link link={link}></Link>
         ))}
+         
       </svg>
+      <div style={{position:"absolute"}}>
       <div
         style={{
           width,
@@ -235,7 +259,20 @@ const TestGraph: React.FC<{ accounts: Account[] }> = ({ accounts }) => {
         {nodes.map(node => (
           <Node {...node}></Node>
         ))}
+       
       </div>
+      </div>
+    
+
+      <svg style={{ position: "absolute" }} width={width} height={height}>
+        
+         {hulls.map(
+          hull => {
+            if (hull) {
+              const p = hull.sort((a,b) => a[1] < b[1] ? -1 : (a[1] > b[1] ? 1: 0))[0];
+              return <Label point={p} text={"hello"}></Label>}}
+        )}
+      </svg>
       <FilterButton mode={mode} setMode={setMode}></FilterButton>
     </div>
   );
