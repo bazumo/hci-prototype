@@ -1,7 +1,7 @@
-import { Box, Fab } from "@material-ui/core";
+import { Box, Fab, Dialog, DialogTitle, TextField, DialogContent, MenuItem, Input, InputLabel, FormControl, DialogActions, Select, Button } from "@material-ui/core";
 import React, { useEffect, useRef, useState, useLayoutEffect } from "react";
 import * as d3 from "d3";
-import { Account } from "../fakedata";
+import { Account, defaultData } from "../fakedata";
 import useWindowDimensions from "../Hooks/useWindowDimension";
 import { Accounts } from "../App";
 import { SimulationNodeDatum, SimulationLinkDatum } from "d3";
@@ -32,8 +32,7 @@ const Node: React.FC<NodeType> = props => {
       }}
       size="large"
       onClick={() => history.push(`/account/${props.id}`)}
-    ></Fab>
-  );
+    ></Fab>)
 };
 
 const Link: React.FC<{ link: any }> = ({ link }) => {
@@ -58,6 +57,9 @@ type LinkType = SimulationLinkDatum<NodeType>;
 const TestGraph: React.FC<{ accounts: Account[] }> = ({ accounts }) => {
   const parentSize = useWindowDimensions();
 
+  const [open, setOpen] = React.useState(false);
+  const [mode, setMode] = React.useState(1);
+
   const height = parentSize.height * 2;
   const width = parentSize.width * 2;
   const [nodes, setNodes] = useState(
@@ -73,8 +75,16 @@ const TestGraph: React.FC<{ accounts: Account[] }> = ({ accounts }) => {
 
   accounts.forEach((a1, i) => {
     accounts.forEach((a2, j) => {
-      if (i !== j && a1.twoFA === a2.twoFA) {
-        passwordDependencies.push({ source: i, target: j });
+      if (i !== j) {
+        let b: boolean = mode == 0 && a1.password === a2.password;
+        b = b || (mode == 1 && a1.email === a2.email);
+        b = b || (mode == 2 && a1.username === a2.username);
+        b = b || (mode == 3 && ((a1.supportsTwoFA == a2.supportsTwoFA && a1.supportsTwoFA) ? a1.twoFA === a2.twoFA : a1.supportsTwoFA == a2.supportsTwoFA));
+        b = b || (mode == 4 && a1.lastLoggedIn.getFullYear() == a2.lastLoggedIn.getFullYear() && a1.lastLoggedIn.getMonth() == a2.lastLoggedIn.getMonth());
+        b = b || (mode == 5 && a1.created.getFullYear() == a2.created.getFullYear());
+        if (b) {
+          passwordDependencies.push({ source: i, target: j });
+        }
       }
     });
   });
@@ -111,10 +121,17 @@ const TestGraph: React.FC<{ accounts: Account[] }> = ({ accounts }) => {
     window.scrollTo(width / 4, height / 4);
   }, [simulation]);
 
-  const [open, setOpen] = React.useState(false);
-  const [mode, setMode] = React.useState(0);
+  useEffect(() => {
+    window.scrollTo(width / 4, height / 4);
+    // update graph
+  }, [mode]);
+
   const handleSwitchMode = () => {
     setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
   };
 
   return (
@@ -135,10 +152,44 @@ const TestGraph: React.FC<{ accounts: Account[] }> = ({ accounts }) => {
           <Node {...node}></Node>
         ))}
       </div>
+      <Dialog
+      disableBackdropClick
+      disableEscapeKeyDown
+      open={open}
+      onClose={() => {setOpen(false)}}
+      >
+        <DialogTitle>Choose Graph view</DialogTitle>
+        <DialogContent style={{ minWidth: "350px" }}>
+          <form>
+            <FormControl>
+              <InputLabel id="mode-label">Sort by</InputLabel>
+                <Select
+                  labelId="mode-label"
+                  id="mode-select"
+                  value={mode}
+                  onChange={e => setMode(e.target.value as any)}
+                  input={<Input />}
+                >
+                  <MenuItem value={0}>password</MenuItem>
+                  <MenuItem value={1}>email</MenuItem>
+                  <MenuItem value={2}>username</MenuItem>
+                  <MenuItem value={3}>2FA</MenuItem>
+                  <MenuItem value={4}>Last log-in (Month)</MenuItem>
+                  <MenuItem value={5}>Created (Year)</MenuItem>
+                </Select>
+              </FormControl>
+            </form>
+        </DialogContent>
+        <DialogActions>
+            <Button onClick={handleClose} color="primary">
+              Ok
+            </Button>
+        </DialogActions>
+      </Dialog>
       <Fab
         color="primary"
         aria-label="edit"
-        //onClick={handleSwitchMode}
+        onClick={handleSwitchMode}
         style={{ position: "fixed", bottom: "80px", right: "20px" }}
       >
         <FilterIcon />
