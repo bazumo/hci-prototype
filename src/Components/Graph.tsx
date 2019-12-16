@@ -45,7 +45,7 @@ const Link: React.FC<{ link: any }> = ({ link }) => {
       y2={link.target.y}
       style={{
         stroke: "#900",
-        strokeOpacity: 1,
+        strokeOpacity: 0,
         strokeWidth: 5
       }}
     />
@@ -57,9 +57,11 @@ const Hull: React.FC<{ points: [number, number][] }> = ({ points }) => {
     <path
       d={"M" + points.join("L") + "Z"}
       style={{
-        stroke: "#009",
+        stroke: "#AAAAAA",
+        fill: "#EEEEEE",
+        fillOpacity: 0.5,
         strokeOpacity: 1,
-        strokeWidth: 5
+        strokeWidth: 2
       }}
     />
   );
@@ -200,15 +202,26 @@ const TestGraph: React.FC<{ accounts: Account[] }> = ({ accounts }) => {
 
   console.log(partitions);
 
+  function get_point (n: NodeType, angle: number) {
+    let radius = 40;
+    return [n.x! + radius *  Math.cos(angle), n.y! + radius *  Math.sin(angle)]
+  }
+
+  function get_points (n: NodeType) {
+    const STEPS = 18;
+    let res = new Array(STEPS);
+    for (let i = 0; i < STEPS; i++) {
+      res[i] = get_point(n, i*2*Math.PI/STEPS);
+    }
+    return res;
+  }
+
   const hulls = partitions.map((nodeSet: NodeType[]) =>
     d3.polygonHull(
       nodeSet
-        .map(n => [
-          [n.x! - 25, n.y! - 25],
-          [n.x! + 25, n.y! + 25],
-          [n.x! - 25, n.y! + 25],
-          [n.x! + 25, n.y! - 25]
-        ])
+        .map(n => 
+          get_points(n)
+        )
         .flat() as any
     )
   );
