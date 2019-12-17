@@ -9,68 +9,39 @@ import {
   FormControl,
   DialogActions,
   Select,
-  Button
+  Button,
+  Paper,
+  Tabs,
+  Tab,
+  Box
 } from "@material-ui/core";
 import React from "react";
 import FilterIcon from "@material-ui/icons/FilterList";
 import { Mode } from "./Graph";
+import UserIcon from "@material-ui/icons/Person";
 export const FilterButton: React.FC<{
   setMode: (val: Mode) => void;
   mode: Mode;
 }> = ({ setMode, mode }) => {
-  const [open, setOpen] = React.useState(false);
-  const handleSwitchMode = () => {
-    setOpen(true);
-  };
-  const handleClose = () => {
-    setOpen(false);
-  };
   return (
-    <>
-      <Dialog
-        disableBackdropClick
-        disableEscapeKeyDown
-        open={open}
-        onClose={() => {
-          setOpen(false);
-        }}
-      >
-        <DialogTitle>Choose Graph view</DialogTitle>
-        <DialogContent style={{ minWidth: "350px" }}>
-          <form>
-            <FormControl>
-              <InputLabel id="mode-label">Sort by</InputLabel>
-              <Select
-                labelId="mode-label"
-                id="mode-select"
-                value={mode}
-                onChange={e => setMode(e.target.value as Mode)}
-                input={<Input />}
-              >
-                <MenuItem value={"password"}>password</MenuItem>
-                <MenuItem value={"email"}>email</MenuItem>
-                <MenuItem value={"username"}>username</MenuItem>
-                <MenuItem value={"2fa"}>2FA</MenuItem>
-                <MenuItem value={"last_login"}>Last log-in (Month)</MenuItem>
-                <MenuItem value={"created"}>Created (Year)</MenuItem>
-              </Select>
-            </FormControl>
-          </form>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose} color="primary">
-            Ok
-          </Button>
-        </DialogActions>
-      </Dialog>
-      <Fab
-        color="primary"
-        aria-label="edit"
-        onClick={handleSwitchMode}
-        style={{ position: "fixed", bottom: "80px", right: "20px" }}
-      >
-        <FilterIcon />
-      </Fab>
-    </>
+    <Box position="fixed" width="100vw">
+      <Paper square>
+        <Tabs
+          value={mode}
+          onChange={(e, val) => setMode(val)}
+          indicatorColor="primary"
+          variant="scrollable"
+          textColor="primary"
+          aria-label="icon tabs example"
+        >
+          <Tab label="E-Mail" value={"email" as Mode} />
+          <Tab label="Password" value={"password" as Mode} />
+          <Tab label="2FA" value={"2fa" as Mode} />
+          <Tab label="Created" value={"created" as Mode} />
+          <Tab label="LastLogin" value={"last_login" as Mode} />
+          <Tab label="Username" value={"username" as Mode} />
+        </Tabs>
+      </Paper>
+    </Box>
   );
 };
