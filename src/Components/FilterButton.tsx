@@ -1,28 +1,11 @@
-import {
-  Fab,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  MenuItem,
-  Input,
-  InputLabel,
-  FormControl,
-  DialogActions,
-  Select,
-  Button,
-  Paper,
-  Tabs,
-  Tab,
-  Box
-} from "@material-ui/core";
+import { Box, Paper, Tab, Tabs } from "@material-ui/core";
 import React from "react";
-import FilterIcon from "@material-ui/icons/FilterList";
 import { Mode } from "./Graph";
-import UserIcon from "@material-ui/icons/Person";
+
 export const FilterButton: React.FC<{
   setMode: (val: Mode) => void;
   mode: Mode;
-}> = ({ setMode, mode }) => {
+}> = React.memo(({ setMode, mode }) => {
   return (
     <Box position="fixed" width="100vw">
       <Paper square>
@@ -44,4 +27,4 @@ export const FilterButton: React.FC<{
       </Paper>
     </Box>
   );
-};
+});
