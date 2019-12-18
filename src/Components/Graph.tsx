@@ -277,13 +277,19 @@ const TestGraph: React.FC<{ accounts: Account[] }> = ({ accounts }) => {
 
     let running = true;
 
-    (function loop() {
-      setFrameCount(s => s + 1);
+    // (function loop() {
+    //   setFrameCount(s => s + 1);
 
+    //   if (running) {
+    //     requestAnimationFrame(loop);
+    //   }
+    // })();
+
+    simulation.on("tick", function onEnd() {
       if (running) {
-        requestAnimationFrame(loop);
+        setFrameCount(s => s + 1);
       }
-    })();
+    });
 
     simulation.on("end", function onEnd() {
       running = false;
