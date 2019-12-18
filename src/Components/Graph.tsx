@@ -1,8 +1,8 @@
 import { Avatar, Box, Fab } from "@material-ui/core";
 import ErrorIcon from "@material-ui/icons/Error";
 import * as d3 from "d3";
-import { SimulationLinkDatum, SimulationNodeDatum } from "d3";
-import React, { useEffect, useState } from "react";
+import { SimulationLinkDatum, SimulationNodeDatum, Simulation } from "d3";
+import React, { useEffect, useState, useRef } from "react";
 import { useHistory } from "react-router-dom";
 import { Accounts } from "../App";
 import { Account } from "../fakedata";
@@ -18,6 +18,8 @@ export const GraphWrapper: React.FC<{}> = () => {
     </Box>
   );
 };
+
+(window as any).count = 0;
 
 const Node: React.FC<NodeType> = props => {
   const history = useHistory();
@@ -58,7 +60,7 @@ const Link: React.FC<{ link: any }> = ({ link }) => {
       y2={link.target.y}
       style={{
         stroke: "#900",
-        strokeOpacity: 0,
+        strokeOpacity: 1,
         strokeWidth: 5
       }}
     />
@@ -117,19 +119,18 @@ function SimluationFactory(
       "charge",
       d3
         .forceManyBody()
-        .distanceMin(100)
-        .distanceMax(200)
+        .distanceMin(10)
+        .strength(-100)
+        .distanceMax(130)
     )
     .force("center", d3.forceCenter(width / 2, height / 2))
     .force(
       "link",
       d3
         .forceLink(links)
-        .distance(100)
-        .strength(0.01)
-    )
-    .alphaMin(0.2)
-    .alphaDecay(0.04);
+        .distance(130)
+        .strength(0.2)
+    );
 }
 
 export type Mode =
@@ -216,52 +217,79 @@ type LinkType = SimulationLinkDatum<NodeType>;
 const TestGraph: React.FC<{ accounts: Account[] }> = ({ accounts }) => {
   const parentSize = useWindowDimensions();
 
-  const [mode, setMode] = React.useState("username" as Mode);
+  const [mode, setMode] = React.useState<Mode>("username");
 
   const height = parentSize.height * 2;
   const width = parentSize.width * 2;
 
-  const [links, setLinks] = useState([] as LinkType[]);
-  const [nodes, setNodes] = useState(
-    accounts.map((a, i) => ({
-      index: i,
-      x: 0,
-      y: 0,
-      ...a
-    })) as NodeType[]
-  );
-
-  const [simulation, setSimulation] = useState(
-    SimluationFactory(nodes, links, width, height)
-  );
+  const [simulation, setSimulation] = useState<
+    Simulation<NodeType, LinkType>
+  >();
 
   useEffect(() => {
-    const dependencyLinks: LinkType[] = [];
+    const links: LinkType[] = [];
+    // Todo handle changing accounts
+    const nodes = simulation
+      ? simulation.nodes()
+      : accounts.map((a, i) => ({
+          index: i,
+          x: 0,
+          y: 0,
+          ...a
+        }));
 
     accounts.forEach((a1, i) => {
       accounts.forEach((a2, j) => {
         if (i !== j) {
           if (filterMap[mode](a1, a2)) {
-            dependencyLinks.push({ source: i, target: j });
+            links.push({ source: i, target: j });
           }
         }
       });
     });
 
-    setLinks(dependencyLinks);
-    setSimulation(SimluationFactory(nodes, links, width, height));
-    window.scrollTo(width / 4, height / 4);
-  }, [mode]);
+    const sim = SimluationFactory(nodes, links, width, height);
 
+    setSimulation(sim);
+    window.scrollTo(width / 4, height / 4);
+
+    return () => {
+      sim.stop();
+    };
+  }, [mode, accounts]);
+
+  const [frameCount, setFrameCount] = useState(0);
   useEffect(() => {
-    simulation.on("tick", () => {
-      setNodes([...nodes]);
-      setLinks([...links]);
-    });
-    window.scrollTo(width / 4, height / 4);
-  }, [simulation]);
+    if (!simulation) {
+      return;
+    }
 
-  const partitions = partition[mode](nodes);
+    let running = true;
+
+    (function loop() {
+      setFrameCount(s => s + 1);
+
+      if (running) {
+        requestAnimationFrame(loop);
+      }
+    })();
+
+    simulation.on("end", function onEnd() {
+      running = false;
+    });
+
+    window.scrollTo(width / 4, height / 4);
+
+    return () => {
+      running = false;
+    };
+  }, [simulation, setFrameCount]);
+
+  if (!simulation) {
+    return null;
+  }
+
+  const partitions = partition[mode](simulation.nodes());
 
   function get_point(n: NodeType, angle: number) {
     let radius = 40;
@@ -298,9 +326,7 @@ const TestGraph: React.FC<{ accounts: Account[] }> = ({ accounts }) => {
             );
           }
         })}
-        {links.map(link => (
-          <Link link={link}></Link>
-        ))}
+        {/* && simulation.links().map(link => <Link link={link}></Link>) */}
       </svg>
       <div style={{ position: "absolute" }}>
         <div
@@ -310,7 +336,7 @@ const TestGraph: React.FC<{ accounts: Account[] }> = ({ accounts }) => {
             position: "relative"
           }}
         >
-          {nodes.map(node => (
+          {simulation.nodes().map(node => (
             <Node {...node}></Node>
           ))}
         </div>
