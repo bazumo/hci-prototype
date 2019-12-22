@@ -350,9 +350,7 @@ const TestGraph: React.FC<{ accounts: Account[] }> = ({ accounts }) => {
             );
           }
         })}
-        {links.current.map(link => (
-          <Link link={link}></Link>
-        ))}
+        {false && links.current.map(link => <Link link={link}></Link>)}
       </svg>
       <div style={{ position: "absolute" }}>
         <div
