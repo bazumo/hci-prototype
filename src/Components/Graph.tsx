@@ -124,24 +124,25 @@ function SimluationFactory(
   width: number,
   height: number
 ) {
+  const attractForce = d3
+    .forceManyBody()
+    .strength(-300)
+    .distanceMin(50)
+    .distanceMax(100);
+
+  const centerForce = d3.forceCenter(width / 2, height / 2);
+  const linkForce = d3
+    .forceLink(links)
+    .distance(100)
+    .strength(0.2);
+  const collisionForce = d3.forceCollide(35).strength(0.2);
+
   return d3
     .forceSimulation(nodes)
-    .force(
-      "charge",
-      d3
-        .forceManyBody()
-        .distanceMin(10)
-        .strength(-100)
-        .distanceMax(130)
-    )
-    .force("center", d3.forceCenter(width / 2, height / 2))
-    .force(
-      "link",
-      d3
-        .forceLink(links)
-        .distance(130)
-        .strength(0.2)
-    );
+    .force("charge", attractForce)
+    .force("center", centerForce)
+    .force("collisionForce", collisionForce)
+    .force("link", linkForce);
 }
 
 export type Mode =
@@ -160,9 +161,12 @@ const filterMap: Record<Mode, (a: Account, b: Account) => boolean> = {
     a1.supportsTwoFA == a2.supportsTwoFA && a1.supportsTwoFA
       ? a1.twoFA === a2.twoFA
       : a1.supportsTwoFA == a2.supportsTwoFA,
-  last_login: (a1, a2) =>
-    a1.lastLoggedIn.getFullYear() == a2.lastLoggedIn.getFullYear() &&
-    a1.lastLoggedIn.getMonth() == a2.lastLoggedIn.getMonth(),
+  last_login: (a1, a2) => {
+    return (
+      a1.lastLoggedIn.getFullYear() === a2.lastLoggedIn.getFullYear() &&
+      a1.lastLoggedIn.getMonth() === a2.lastLoggedIn.getMonth()
+    );
+  },
   created: (a1, a2) => a1.created.getFullYear() == a2.created.getFullYear()
 };
 
@@ -207,7 +211,8 @@ const partition: Record<Mode, (nodes: NodeType[]) => [string, NodeType[]][]> = {
   last_login: nodes => {
     const groups = {};
     nodes.forEach(n => {
-      const key = n.a.created.getFullYear() + "/" + n.a.created.getMonth();
+      const key =
+        n.a.lastLoggedIn.getFullYear() + "/" + n.a.lastLoggedIn.getMonth();
       groups[key] = groups[key] ? [...groups[key], n] : [n];
     });
     return Object.entries(groups);
@@ -237,29 +242,31 @@ const TestGraph: React.FC<{ accounts: Account[] }> = ({ accounts }) => {
     Simulation<NodeType, LinkType>
   >();
 
+  const links = useRef<LinkType[]>([]);
+
   useEffect(() => {
-    const links: LinkType[] = [];
     // Todo handle changing accounts
     const nodes = simulation
       ? simulation.nodes()
       : accounts.map((a, i) => ({
           index: i,
-          x: 0,
-          y: 0,
+          x: width / 2,
+          y: height / 2,
           a
         }));
+
+    links.current = [];
 
     accounts.forEach((a1, i) => {
       accounts.forEach((a2, j) => {
         if (i !== j) {
           if (filterMap[mode](a1, a2)) {
-            links.push({ source: i, target: j });
+            links.current.push({ source: i, target: j });
           }
         }
       });
     });
-
-    const sim = SimluationFactory(nodes, links, width, height);
+    const sim = SimluationFactory(nodes, links.current, width, height);
 
     setSimulation(sim);
     window.scrollTo(width / 4, height / 4);
@@ -343,7 +350,9 @@ const TestGraph: React.FC<{ accounts: Account[] }> = ({ accounts }) => {
             );
           }
         })}
-        {/* && simulation.links().map(link => <Link link={link}></Link>) */}
+        {links.current.map(link => (
+          <Link link={link}></Link>
+        ))}
       </svg>
       <div style={{ position: "absolute" }}>
         <div
